@@ -1,0 +1,96 @@
+# Core dependencies
+torch
+torchvision
+torchaudio
+pytorch-lightning
+
+# Data processing - Fix NumPy compatibility
+numpy>=1.21.0,<2.0.0  # NumPy 1.x for compatibility
+opencv-python
+librosa
+scipy
+scikit-learn
+pandas
+
+# Audio processing and ASR
+transformers  # Required for Qwen3 support
+datasets
+soundfile
+whisper-openai
+
+# Video processing
+ffmpeg-python
+imageio
+imageio-ffmpeg
+
+# Face detection and processing
+mtcnn
+facenet-pytorch
+
+# Phoneme processing - Make MFA optional due to complexity
+# Montreal-Forced-Aligner>=2.0.0  # Optional - install separately if needed
+epitran
+phonemizer
+
+# Configuration and utilities
+pyyaml
+omegaconf
+hydra-core
+rich  # Enhanced rich logging support
+tqdm
+
+# Visualization
+matplotlib
+seaborn
+tensorboard
+wandb
+
+# Development and testing
+pytest
+pytest-cov
+black
+flake8
+mypy
+
+# Performance optimization
+# numba>=0.56.0  # Skip numba due to Python 3.12 compatibility
+einops>=0.4.0
+
+# Model optimization
+peft  # For LoRA
+bitsandbytes  # For quantization
+accelerate
+
+# Data storage and loading
+h5py
+lmdb
+webdataset
+
+# Evaluation metrics
+jiwer  # Word Error Rate
+sacrebleu  # BLEU score
+editdistance
+
+# Additional dependencies for dataset processing
+albumentations
+nltk
+g2p_en
+inflect
+distance
+typeguard
+
+# AVSpeech dataset downloading
+yt-dlp
+
+# Multi-GPU training options
+# Option 1: PyTorch native DDP (built-in, no extra dependencies) - RECOMMENDED
+# Option 2: Accelerate (user-friendly alternative)
+accelerate>=0.24.0  # Hugging Face Accelerate for easy multi-GPU training
+
+# System monitoring (optional)
+psutil>=5.9.0      # System resource monitoring
+GPUtil>=1.4.0      # GPU monitoring
+
+# Optional: Cloud storage
+# boto3>=1.24.0  # AWS S3
+# google-cloud-storage>=2.5.0  # Google Cloud Storage

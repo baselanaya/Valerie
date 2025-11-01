@@ -1,0 +1,257 @@
+2025-08-17 01:23:54,894 - INFO -    Data root: data
+2025-08-17 01:23:54,894 - INFO -    Output dir: data/transcriptions
+2025-08-17 01:23:54,894 - INFO -    Model: base
+2025-08-17 01:23:54,894 - INFO -    Device: auto
+2025-08-17 01:23:54,894 - INFO -    Language: en
+2025-08-17 01:23:54,894 - INFO -    Max files: None
+2025-08-17 01:23:54,894 - INFO -    Workers: 1
+2025-08-17 01:27:42,008 - INFO - Starting transcription generation
+2025-08-17 01:27:42,008 - INFO -    Data root: data
+2025-08-17 01:27:42,008 - INFO -    Output dir: data/transcriptions
+2025-08-17 01:27:42,008 - INFO -    Model: base
+2025-08-17 01:27:42,008 - INFO -    Device: auto
+2025-08-17 01:27:42,008 - INFO -    Language: en
+2025-08-17 01:27:42,008 - INFO -    Max files: None
+2025-08-17 01:27:42,008 - INFO -    Workers: 1
+2025-08-17 01:27:42,027 - INFO - Initializing Whisper base on cuda
+2025-08-17 01:27:42,836 - INFO - Whisper base loaded successfully
+2025-08-17 01:27:42,836 - INFO - Model specs - Params: 74M, VRAM: ~1GB, Speed: 16x
+2025-08-17 01:27:42,836 - INFO - Scanning for MP4 files in data
+2025-08-17 01:34:26,256 - INFO - Starting transcription generation
+2025-08-17 01:34:26,256 - INFO -    Data root: data
+2025-08-17 01:34:26,256 - INFO -    Output dir: data/transcriptions
+2025-08-17 01:34:26,256 - INFO -    Model: tiny
+2025-08-17 01:34:26,256 - INFO -    Device: auto
+2025-08-17 01:34:26,256 - INFO -    Language: en
+2025-08-17 01:34:26,256 - INFO -    Max files: 3
+2025-08-17 01:34:26,256 - INFO -    Workers: 1
+2025-08-17 01:34:26,341 - INFO - Initializing Whisper tiny on cuda
+2025-08-17 01:34:27,866 - INFO - Whisper tiny loaded successfully
+2025-08-17 01:34:27,866 - INFO - Model specs - Params: 39M, VRAM: ~1GB, Speed: 32x
+2025-08-17 01:34:27,866 - INFO - Scanning for M4A audio files in data
+2025-08-17 01:39:53,716 - INFO - Auto-optimized workers for large-v3 model: 1
+2025-08-17 01:39:53,811 - INFO - Starting transcription generation
+2025-08-17 01:39:53,812 - INFO -    Data root: data
+2025-08-17 01:39:53,812 - INFO -    Output dir: data/transcriptions
+2025-08-17 01:39:53,812 - INFO -    Model: large-v3
+2025-08-17 01:39:53,812 - INFO -    Device: auto
+2025-08-17 01:39:53,812 - INFO -    Language: en
+2025-08-17 01:39:53,812 - INFO -    Max files: None
+2025-08-17 01:39:53,812 - INFO -    Workers: 1
+2025-08-17 01:39:53,813 - INFO -    GPU: NVIDIA GeForce RTX 4070 Laptop GPU (8.0GB VRAM)
+2025-08-17 01:39:53,813 - INFO - Initializing Whisper large-v3 on cuda
+2025-08-17 01:39:53,813 - ERROR - Failed to load Whisper model: Model large-v3 not found; available models = ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large']
+2025-08-17 01:41:47,507 - INFO - Auto-optimized workers for large-v3 model: 1
+2025-08-17 01:41:47,509 - INFO - Starting transcription generation
+2025-08-17 01:41:47,509 - INFO -    Data root: data
+2025-08-17 01:41:47,509 - INFO -    Output dir: data/transcriptions
+2025-08-17 01:41:47,509 - INFO -    Model: large-v3
+2025-08-17 01:41:47,509 - INFO -    Device: auto
+2025-08-17 01:41:47,509 - INFO -    Language: en
+2025-08-17 01:41:47,509 - INFO -    Max files: None
+2025-08-17 01:41:47,509 - INFO -    Workers: 1
+2025-08-17 01:41:47,509 - INFO -    GPU: NVIDIA GeForce RTX 4070 Laptop GPU (8.0GB VRAM)
+2025-08-17 01:41:47,509 - INFO - Initializing Whisper large-v3 on cuda
+2025-08-17 01:41:47,511 - ERROR - Failed to load Whisper model: Model large-v3 not found; available models = ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large']
+2025-08-17 01:42:16,655 - INFO - Auto-optimized workers for large-v2 model: 1
+2025-08-17 01:42:16,655 - INFO - Starting transcription generation
+2025-08-17 01:42:16,655 - INFO -    Data root: data
+2025-08-17 01:42:16,655 - INFO -    Output dir: data/transcriptions
+2025-08-17 01:42:16,655 - INFO -    Model: large-v2
+2025-08-17 01:42:16,656 - INFO -    Device: auto
+2025-08-17 01:42:16,656 - INFO -    Language: en
+2025-08-17 01:42:16,656 - INFO -    Max files: None
+2025-08-17 01:42:16,656 - INFO -    Workers: 1
+2025-08-17 01:42:16,656 - INFO -    GPU: NVIDIA GeForce RTX 4070 Laptop GPU (8.0GB VRAM)
+2025-08-17 01:42:16,657 - INFO - Initializing Whisper large-v2 on cuda
+2025-08-17 01:44:51,046 - INFO - Whisper large-v2 loaded successfully
+2025-08-17 01:44:51,047 - INFO - Model specs - Params: 1550M, VRAM: ~10GB, Speed: 1x
+2025-08-17 01:44:51,047 - INFO - Scanning for M4A audio files in data
+2025-08-17 01:48:37,496 - INFO - Found 1128246 M4A files
+2025-08-17 01:48:37,498 - INFO - Transcribing: 00001
+2025-08-17 01:49:03,698 - INFO - Completed 00001 in 26.2s: 'There's an engagement with Chloe, so that's kind o...'
+2025-08-17 01:49:03,699 - INFO - Transcribing: 00002
+2025-08-17 01:49:32,307 - INFO - Completed 00002 in 28.6s: 'that kind of stuff happening. But Jimmy's also kin...'
+2025-08-17 01:49:32,308 - INFO - Transcribing: 00003
+2025-08-17 01:49:59,057 - INFO - Completed 00003 in 26.7s: 'as passive and stuff and kind of going after what ...'
+2025-08-17 01:49:59,058 - INFO - Transcribing: 00004
+2025-08-17 01:50:12,567 - INFO - Completed 00004 in 13.5s: 'things like that but I don't think I deal with thi...'
+2025-08-17 01:50:12,568 - INFO - Transcribing: 00005
+2025-08-17 01:50:25,782 - INFO - Completed 00005 in 13.2s: 'is something that I don't like, I kind of confront...'
+2025-08-17 01:50:25,783 - INFO - Transcribing: 00006
+2025-08-17 01:50:34,656 - INFO - Completed 00006 in 8.9s: 'Yeah, everybody was friendly and everybody knew th...'
+2025-08-17 01:50:34,657 - INFO - Transcribing: 00007
+2025-08-17 01:51:07,473 - INFO - Completed 00007 in 32.8s: 'noir which was in season six it was this kind of r...'
+2025-08-17 01:51:07,474 - INFO - Transcribing: 00008
+2025-08-17 01:51:28,100 - INFO - Completed 00008 in 20.6s: 'character a different time period it was a lot of ...'
+2025-08-17 01:51:28,101 - INFO - Transcribing: 00009
+2025-08-17 01:51:53,334 - INFO - Completed 00009 in 25.2s: 'electric chairs, like shackles and stuff, and thos...'
+2025-08-17 01:51:53,334 - INFO - Transcribing: 00010
+2025-08-17 01:52:12,682 - INFO - Completed 00010 in 19.3s: 'kind of way to shoot because you're all day you're...'
+2025-08-17 01:52:12,684 - INFO - Transcribing: 00011
+2025-08-17 01:52:27,243 - INFO - Completed 00011 in 14.6s: 'in the streets of Metropolis. it's a mean city so ...'
+2025-08-17 01:52:27,244 - INFO - Transcribing: 00012
+2025-08-17 01:52:41,559 - INFO - Completed 00012 in 14.3s: 'or special effects stuff, everything's kind of, it...'
+2025-08-17 01:52:41,560 - INFO - Transcribing: 00013
+2025-08-17 01:52:55,856 - INFO - Completed 00013 in 14.3s: 'and work even though it's kind of weird conditions...'
+2025-08-17 01:52:55,858 - INFO - Transcribing: 00014
+2025-08-17 01:53:12,749 - INFO - Completed 00014 in 16.9s: 'I've done a couple, you know, like some fight sequ...'
+2025-08-17 01:53:12,750 - INFO - Transcribing: 00015
+2025-08-17 01:53:21,001 - INFO - Completed 00015 in 8.2s: 'Jimmy hasn't got any powers yet, so I haven't got ...'
+2025-08-17 01:53:21,001 - INFO - Transcribing: 00016
+2025-08-17 01:53:40,611 - INFO - Completed 00016 in 19.6s: 'very low-key, real easy, I wouldn't have to ship o...'
+2025-08-17 01:53:40,612 - INFO - Transcribing: 00017
+2025-08-17 01:53:57,547 - INFO - Completed 00017 in 16.9s: 'Getting to come back for the six and really finish...'
+2025-08-17 01:53:57,548 - INFO - Transcribing: 00018
+2025-08-17 01:54:19,395 - INFO - Completed 00018 in 21.8s: 'I thought that there might be a chance because the...'
+2025-08-17 01:54:19,395 - INFO - Transcribing: 00019
+2025-08-17 01:54:27,745 - INFO - Completed 00019 in 8.3s: 'Well the first season is actually already aired on...'
+2025-08-17 01:54:27,746 - INFO - Transcribing: 00115
+2025-08-17 01:54:36,027 - INFO - Completed 00115 in 8.3s: 'So I in the summertime, so I'd like had a great ti...'
+2025-08-17 01:54:36,029 - INFO - Transcribing: 00116
+2025-08-17 01:54:50,503 - INFO - Completed 00116 in 14.5s: 'It must have gone fairly well. It was a lot of fun...'
+2025-08-17 01:54:50,504 - INFO - Transcribing: 00117
+2025-08-17 01:55:00,205 - INFO - Completed 00117 in 9.7s: 'Yeah, I mean any show, you know, when you're worki...'
+2025-08-17 01:55:00,207 - INFO - Transcribing: 00118
+2025-08-17 01:55:15,895 - INFO - Completed 00118 in 15.7s: 'And what's really neat is even when the shows are ...'
+2025-08-17 01:55:15,897 - INFO - Transcribing: 00119
+2025-08-17 01:55:26,189 - INFO - Completed 00119 in 10.3s: 'Probably in the spring I guess, you know, there's ...'
+2025-08-17 01:55:26,190 - INFO - Transcribing: 00120
+2025-08-17 01:55:49,261 - INFO - Completed 00120 in 23.1s: 'an agent, an ATF agent, so it was a little more pr...'
+2025-08-17 01:55:49,263 - INFO - Transcribing: 00121
+2025-08-17 01:56:10,621 - INFO - Completed 00121 in 21.4s: 'I think so. You have to put yourself in different ...'
+2025-08-17 01:56:10,622 - INFO - Transcribing: 00122
+2025-08-17 01:56:29,590 - INFO - Completed 00122 in 19.0s: 'like last year it's gonna be amazing because I kno...'
+2025-08-17 01:56:29,592 - INFO - Transcribing: 00123
+2025-08-17 01:56:47,508 - INFO - Completed 00123 in 17.9s: 'Laura Vandervoorde here I think this weekend. So y...'
+2025-08-17 01:56:47,509 - INFO - Transcribing: 00124
+2025-08-17 01:57:07,037 - INFO - Completed 00124 in 19.5s: 'Yeah, um, the character is John Jacoby and he's be...'
+2025-08-17 01:57:07,038 - INFO - Transcribing: 00125
+2025-08-17 01:57:19,123 - INFO - Completed 00125 in 12.1s: 'because both Luke and Hannah's character really so...'
+2025-08-17 01:57:19,124 - INFO - Transcribing: 00020
+2025-08-17 01:57:33,689 - INFO - Completed 00020 in 14.6s: 'people responded to it pretty well. But yeah, we d...'
+2025-08-17 01:57:33,690 - INFO - Transcribing: 00021
+2025-08-17 01:57:47,814 - INFO - Completed 00021 in 14.1s: 'and stuff too if somebody asked a question we'd gi...'
+2025-08-17 01:57:47,815 - INFO - Transcribing: 00022
+2025-08-17 01:57:55,919 - INFO - Completed 00022 in 8.1s: 'like an awkward moment or anything like that, like...'
+2025-08-17 01:57:55,920 - INFO - Transcribing: 00023
+2025-08-17 01:58:09,474 - INFO - Completed 00023 in 13.6s: 'of sort of weird, awkward moments throughout that ...'
+2025-08-17 01:58:09,475 - INFO - Transcribing: 00024
+2025-08-17 01:58:16,494 - INFO - Completed 00024 in 7.0s: 'is comfortable in some of these scenarios and that...'
+2025-08-17 01:58:16,495 - INFO - Transcribing: 00025
+2025-08-17 01:58:21,786 - INFO - Completed 00025 in 5.3s: 'stuff but I think that you know seeing somebody wh...'
+2025-08-17 01:58:21,787 - INFO - Transcribing: 00026
+2025-08-17 01:58:32,259 - INFO - Completed 00026 in 10.5s: 'draws opposites together so I think that's really ...'
+2025-08-17 01:58:32,261 - INFO - Transcribing: 00027
+2025-08-17 01:58:38,820 - INFO - Completed 00027 in 6.6s: 'You know, I think it would have been difficult to ...'
+2025-08-17 01:58:38,821 - INFO - Transcribing: 00028
+2025-08-17 01:58:49,176 - INFO - Completed 00028 in 10.4s: 'So keeping it grounded and playing that reality an...'
+2025-08-17 01:58:49,177 - INFO - Transcribing: 00029
+2025-08-17 01:59:01,307 - INFO - Completed 00029 in 12.1s: 'as drama and there's emotion and all that stuff. I...'
+2025-08-17 01:59:01,308 - INFO - Transcribing: 00030
+2025-08-17 01:59:14,727 - INFO - Completed 00030 in 13.4s: 'I think on print things not where I've done interv...'
+2025-08-17 01:59:14,728 - INFO - Transcribing: 00031
+2025-08-17 01:59:25,813 - INFO - Completed 00031 in 11.1s: 'or something and it happens back and forth like th...'
+2025-08-17 01:59:25,814 - INFO - Transcribing: 00126
+2025-08-17 01:59:37,692 - INFO - Completed 00126 in 11.9s: 'You know, similar, like, awesome energies, everybo...'
+2025-08-17 01:59:37,693 - INFO - Transcribing: 00127
+2025-08-17 01:59:49,506 - INFO - Completed 00127 in 11.8s: 'kind of here to have fun and that makes it easy fo...'
+2025-08-17 01:59:49,507 - INFO - Transcribing: 00128
+2025-08-17 02:00:05,494 - INFO - Completed 00128 in 16.0s: 'It's been great. I mean to be honest with you I th...'
+2025-08-17 02:00:05,495 - INFO - Transcribing: 00129
+2025-08-17 02:00:24,776 - INFO - Completed 00129 in 19.3s: '75 years old who watch Smallville or somebody who'...'
+2025-08-17 02:00:24,777 - INFO - Transcribing: 00130
+2025-08-17 02:00:42,352 - INFO - Completed 00130 in 17.6s: 'I went to in the States. Yeah, like older people w...'
+2025-08-17 02:00:42,353 - INFO - Transcribing: 00131
+2025-08-17 02:00:48,251 - INFO - Completed 00131 in 5.9s: 'The big difference between Jimmy and Steve and tho...'
+2025-08-17 02:00:48,252 - INFO - Transcribing: 00132
+2025-08-17 02:01:01,565 - INFO - Completed 00132 in 13.3s: 'fortunate to work with some of the, I think some o...'
+2025-08-17 02:01:01,566 - INFO - Transcribing: 00133
+2025-08-17 02:01:07,612 - INFO - Completed 00133 in 6.0s: 'more male dominated stuff, especially if you look ...'
+2025-08-17 02:01:07,613 - INFO - Transcribing: 00134
+2025-08-17 02:01:21,452 - INFO - Completed 00134 in 13.8s: 'I was living down in LA, but I'd been back for a l...'
+2025-08-17 02:01:21,454 - INFO - Transcribing: 00135
+2025-08-17 02:01:34,901 - INFO - Completed 00135 in 13.4s: 'Jack Kenny and we just sat down and had breakfast ...'
+2025-08-17 02:01:34,903 - INFO - Transcribing: 00136
+2025-08-17 02:01:40,999 - INFO - Completed 00136 in 6.1s: 'But it's very rarely that they come that easy, so ...'
+2025-08-17 02:01:41,000 - INFO - Transcribing: 00137
+2025-08-17 02:01:57,294 - INFO - Completed 00137 in 16.3s: 'No, people haven't come up to me and done that too...'
+2025-08-17 02:01:57,295 - INFO - Transcribing: 00138
+2025-08-17 02:02:10,488 - INFO - Completed 00138 in 13.2s: 'the invisibles, Grant Morrison, and my head's shav...'
+2025-08-17 02:02:10,490 - INFO - Transcribing: 00139
+2025-08-17 02:02:17,465 - INFO - Completed 00139 in 7.0s: 'from Grand Rock, it's a comedy and I've got a supp...'
+2025-08-17 02:02:17,467 - INFO - Transcribing: 00032
+2025-08-17 02:02:44,256 - INFO - Completed 00032 in 26.8s: 'Well, totally different shows. Warehouse 13's got ...'
+2025-08-17 02:02:44,258 - INFO - Transcribing: 00033
+2025-08-17 02:02:57,464 - INFO - Completed 00033 in 13.2s: 'Yeah, actually I think a better reception even tha...'
+2025-08-17 02:02:57,465 - INFO - Transcribing: 00034
+2025-08-17 02:03:16,753 - INFO - Completed 00034 in 19.3s: 'he was sort of insecure and whatever and that's th...'
+2025-08-17 02:03:16,754 - INFO - Transcribing: 00035
+2025-08-17 02:03:34,103 - INFO - Completed 00035 in 17.3s: 'that we have as a cast works really well and the w...'
+2025-08-17 02:03:34,104 - INFO - Transcribing: 00036
+2025-08-17 02:03:47,739 - INFO - Completed 00036 in 13.6s: 'really good. I was really surprised. Because you k...'
+2025-08-17 02:03:47,740 - INFO - Transcribing: 00037
+2025-08-17 02:04:12,422 - INFO - Completed 00037 in 24.7s: 'But yeah, I mean it's great you get to come and me...'
+2025-08-17 02:04:12,423 - INFO - Transcribing: 00038
+2025-08-17 02:04:27,024 - INFO - Completed 00038 in 14.6s: 'Yeah, I mean, I'm up for doing whatever. For me, i...'
+2025-08-17 02:04:27,025 - INFO - Transcribing: 00039
+2025-08-17 02:04:55,681 - INFO - Completed 00039 in 28.7s: 'And yeah, for sure, but I haven't been pitched too...'
+2025-08-17 02:04:55,682 - INFO - Transcribing: 00040
+2025-08-17 02:05:10,833 - INFO - Completed 00040 in 15.1s: 'I would love to be able to ping pong between both....'
+2025-08-17 02:05:10,834 - INFO - Transcribing: 00041
+2025-08-17 02:05:26,949 - INFO - Completed 00041 in 16.1s: 'you know, sort of acting muscles, so I'd love to b...'
+2025-08-17 02:05:26,950 - INFO - Transcribing: 00042
+2025-08-17 02:05:39,434 - INFO - Completed 00042 in 12.5s: 'that Kevin Bacon was already attached, Kevin Willi...'
+2025-08-17 02:05:39,435 - INFO - Transcribing: 00043
+2025-08-17 02:06:20,366 - INFO - Completed 00043 in 40.9s: 'So that's what really drew me in, but once I got t...'
+2025-08-17 02:06:20,367 - INFO - Transcribing: 00044
+2025-08-17 02:06:25,608 - INFO - Completed 00044 in 5.2s: 'Yeah, and he just became such a defensive characte...'
+2025-08-17 02:06:25,609 - INFO - Transcribing: 00045
+2025-08-17 02:06:31,454 - INFO - Completed 00045 in 5.8s: 'in the very first episode he was already kind of w...'
+2025-08-17 02:06:31,455 - INFO - Transcribing: 00046
+2025-08-17 02:06:41,367 - INFO - Completed 00046 in 9.9s: 'The idea was to watch Mike go from, to watch what ...'
+2025-08-17 02:06:41,368 - INFO - Transcribing: 00047
+2025-08-17 02:06:53,745 - INFO - Completed 00047 in 12.4s: 'and were to vary the ages of the character, becaus...'
+2025-08-17 02:06:53,746 - INFO - Transcribing: 00048
+2025-08-17 02:07:00,443 - INFO - Completed 00048 in 6.7s: 'true to the comic books would have been the same a...'
+2025-08-17 02:07:00,445 - INFO - Transcribing: 00049
+2025-08-17 02:07:14,132 - INFO - Completed 00049 in 13.7s: 'and what that means for their lives, how special t...'
+2025-08-17 02:07:14,133 - INFO - Transcribing: 00050
+2025-08-17 02:07:18,859 - INFO - Completed 00050 in 4.7s: 'having Bobby discover his abilities over the years...'
+2025-08-17 02:07:18,860 - INFO - Transcribing: 00051
+2025-08-17 02:07:32,598 - INFO - Completed 00051 in 13.7s: 'I always loved working with that group of people a...'
+2025-08-17 02:07:32,599 - INFO - Transcribing: 00052
+2025-08-17 02:08:31,015 - INFO - Completed 00052 in 58.4s: 'holiday break watching a bunch of crime documentar...'
+2025-08-17 02:08:31,016 - INFO - Transcribing: 00053
+2025-08-17 02:08:41,657 - INFO - Completed 00053 in 10.6s: 'together to investigate people that are already in...'
+2025-08-17 02:08:41,658 - INFO - Transcribing: 00054
+2025-08-17 02:08:52,955 - INFO - Completed 00054 in 11.3s: 'I thought it felt very timely, and it's a role I'v...'
+2025-08-17 02:08:52,956 - INFO - Transcribing: 00055
+2025-08-17 02:09:06,127 - INFO - Completed 00055 in 13.2s: 'people making it. Liz Friedman and Liz Friedlander...'
+2025-08-17 02:09:06,128 - INFO - Transcribing: 00056
+2025-08-17 02:09:24,507 - INFO - Completed 00056 in 18.4s: 'be successful because he's clearly very talented b...'
+2025-08-17 02:09:24,508 - INFO - Transcribing: 00057
+2025-08-17 02:09:39,530 - INFO - Completed 00057 in 15.0s: 'and we've lost Dav and I think John that's really ...'
+2025-08-17 02:09:39,531 - INFO - Transcribing: 00058
+2025-08-17 02:09:51,478 - INFO - Completed 00058 in 11.9s: 'we know that Klein has taken him, or we suspect th...'
+2025-08-17 02:09:51,479 - INFO - Transcribing: 00059
+2025-08-17 02:09:58,421 - INFO - Completed 00059 in 6.9s: 'looking for. It's what we do. So we're on the job....'
+2025-08-17 02:09:58,422 - INFO - Transcribing: 00060
+2025-08-17 02:10:05,231 - INFO - Completed 00060 in 6.8s: 'Well, I mean, I think that John, like all he wante...'
+2025-08-17 02:10:05,231 - INFO - Transcribing: 00061
+2025-08-17 02:10:16,138 - INFO - Completed 00061 in 10.9s: 'And I think that he still, all he wants is to get ...'
+2025-08-17 02:10:16,140 - INFO - Transcribing: 00062
+2025-08-17 02:10:22,238 - INFO - Completed 00062 in 6.1s: 'I've been talking about that. It feels much bigger...'
+2025-08-17 02:10:22,238 - INFO - Transcribing: 00063
+2025-08-17 02:10:41,733 - INFO - Completed 00063 in 19.5s: 'characters, but also just more of the world. So it...'
+2025-08-17 02:10:41,734 - INFO - Transcribing: 00064
+2025-08-17 02:10:55,535 - INFO - Completed 00064 in 13.8s: 'at Red 17 and they've been kind of experimenting w...'
+2025-08-17 02:10:55,537 - INFO - Transcribing: 00065
+2025-08-17 02:11:14,595 - INFO - Completed 00065 in 19.1s: 'I also think that once we got past in the first se...'
+2025-08-17 02:11:14,595 - INFO - Transcribing: 00066
+2025-08-17 02:11:31,638 - INFO - Completed 00066 in 17.0s: 'Not to say that we don't still have a lot of inter...'
+2025-08-17 02:11:31,640 - INFO - Transcribing: 00140
+2025-08-17 02:11:45,418 - INFO - Completed 00140 in 13.8s: 'Yeah, well we started as kids sort of working toge...'
+2025-08-17 02:11:45,419 - INFO - Transcribing: 00141
+2025-08-17 02:12:30,743 - INFO - Completed 00141 in 45.3s: 'And we did a film called Gross Misconduct where we...'
+2025-08-17 02:12:30,744 - INFO - Transcribing: 00142

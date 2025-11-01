@@ -1,0 +1,29 @@
+# Requirements for transcription pipeline
+# Core dependencies
+torch>=2.0.0
+torchaudio>=2.0.0
+numpy>=1.21.0
+tqdm>=4.64.0
+
+# Audio processing
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# ASR models
+openai-whisper>=20240930
+# Alternative: transformers>=4.21.0  # For Hugging Face models
+
+# Phoneme conversion (optional, fallbacks available)
+# epitran>=1.24  # For IPA phonemes
+# espeak-ng     # System dependency, install via: apt-get install espeak-ng
+
+# Utilities
+pathlib
+argparse
+logging
+json
+multiprocessing
+concurrent.futures
+
+# Development/testing
+pytest>=7.0.0
