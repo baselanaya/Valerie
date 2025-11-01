@@ -1,0 +1,303 @@
+{
+  "file": "data\\dev\\aac\\id00012\\21Uxsk56VDQ\\00001.m4a",
+  "audio_source": "data\\dev\\aac\\id00012\\21Uxsk56VDQ\\00001.m4a",
+  "status": "success",
+  "transcription": {
+    "text": "There's an engagement with Chloe, so that's kind of a big deal for him and it's probably going to happen, you know, leading towards the wedding and stuff. if there's a lot of engagement.",
+    "language": "en",
+    "duration": 0.0,
+    "segments": [
+      {
+        "id": 0,
+        "seek": 0,
+        "start": 0.0,
+        "end": 3.96,
+        "text": " There's an engagement with Chloe, so that's kind of a big deal for him",
+        "tokens": [
+          821,
+          311,
+          364,
+          8742,
+          365,
+          29694,
+          11,
+          370,
+          300,
+          311,
+          733,
+          295,
+          257,
+          955,
+          2028,
+          337,
+          796
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.2792635811699761,
+        "compression_ratio": 1.3880597014925373,
+        "no_speech_prob": 0.31105169653892517
+      },
+      {
+        "id": 1,
+        "seek": 396,
+        "start": 3.96,
+        "end": 7.76,
+        "text": " and it's probably going to happen, you know, leading towards the wedding and stuff.",
+        "tokens": [
+          293,
+          309,
+          311,
+          1391,
+          516,
+          281,
+          1051,
+          11,
+          291,
+          458,
+          11,
+          5775,
+          3030,
+          264,
+          8523,
+          293,
+          1507,
+          13
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.43421706031350527,
+        "compression_ratio": 1.2424242424242424,
+        "no_speech_prob": 0.1264500617980957
+      },
+      {
+        "id": 2,
+        "seek": 776,
+        "start": 7.76,
+        "end": 10.76,
+        "text": " if there's a lot of engagement.",
+        "tokens": [
+          50364,
+          498,
+          456,
+          311,
+          257,
+          688,
+          295,
+          8742,
+          13,
+          50514
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.5033985484730114,
+        "compression_ratio": 0.7948717948717948,
+        "no_speech_prob": 0.2946198284626007
+      }
+    ],
+    "words": [
+      {
+        "word": "There's",
+        "start": 0.0,
+        "end": 0.28285714285714286,
+        "probability": 0.5
+      },
+      {
+        "word": "an",
+        "start": 0.28285714285714286,
+        "end": 0.5657142857142857,
+        "probability": 0.5
+      },
+      {
+        "word": "engagement",
+        "start": 0.5657142857142857,
+        "end": 0.8485714285714285,
+        "probability": 0.5
+      },
+      {
+        "word": "with",
+        "start": 0.8485714285714285,
+        "end": 1.1314285714285715,
+        "probability": 0.5
+      },
+      {
+        "word": "Chloe,",
+        "start": 1.1314285714285715,
+        "end": 1.4142857142857144,
+        "probability": 0.5
+      },
+      {
+        "word": "so",
+        "start": 1.4142857142857144,
+        "end": 1.6971428571428573,
+        "probability": 0.5
+      },
+      {
+        "word": "that's",
+        "start": 1.697142857142857,
+        "end": 1.98,
+        "probability": 0.5
+      },
+      {
+        "word": "kind",
+        "start": 1.98,
+        "end": 2.262857142857143,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 2.262857142857143,
+        "end": 2.545714285714286,
+        "probability": 0.5
+      },
+      {
+        "word": "a",
+        "start": 2.545714285714286,
+        "end": 2.8285714285714287,
+        "probability": 0.5
+      },
+      {
+        "word": "big",
+        "start": 2.8285714285714287,
+        "end": 3.1114285714285717,
+        "probability": 0.5
+      },
+      {
+        "word": "deal",
+        "start": 3.1114285714285717,
+        "end": 3.3942857142857146,
+        "probability": 0.5
+      },
+      {
+        "word": "for",
+        "start": 3.394285714285714,
+        "end": 3.677142857142857,
+        "probability": 0.5
+      },
+      {
+        "word": "him",
+        "start": 3.677142857142857,
+        "end": 3.96,
+        "probability": 0.5
+      },
+      {
+        "word": "and",
+        "start": 3.96,
+        "end": 4.231428571428571,
+        "probability": 0.5
+      },
+      {
+        "word": "it's",
+        "start": 4.231428571428571,
+        "end": 4.502857142857143,
+        "probability": 0.5
+      },
+      {
+        "word": "probably",
+        "start": 4.502857142857143,
+        "end": 4.774285714285714,
+        "probability": 0.5
+      },
+      {
+        "word": "going",
+        "start": 4.774285714285714,
+        "end": 5.045714285714285,
+        "probability": 0.5
+      },
+      {
+        "word": "to",
+        "start": 5.045714285714285,
+        "end": 5.317142857142857,
+        "probability": 0.5
+      },
+      {
+        "word": "happen,",
+        "start": 5.317142857142857,
+        "end": 5.588571428571428,
+        "probability": 0.5
+      },
+      {
+        "word": "you",
+        "start": 5.588571428571429,
+        "end": 5.86,
+        "probability": 0.5
+      },
+      {
+        "word": "know,",
+        "start": 5.859999999999999,
+        "end": 6.131428571428571,
+        "probability": 0.5
+      },
+      {
+        "word": "leading",
+        "start": 6.131428571428572,
+        "end": 6.402857142857143,
+        "probability": 0.5
+      },
+      {
+        "word": "towards",
+        "start": 6.402857142857142,
+        "end": 6.6742857142857135,
+        "probability": 0.5
+      },
+      {
+        "word": "the",
+        "start": 6.674285714285714,
+        "end": 6.945714285714286,
+        "probability": 0.5
+      },
+      {
+        "word": "wedding",
+        "start": 6.945714285714285,
+        "end": 7.217142857142856,
+        "probability": 0.5
+      },
+      {
+        "word": "and",
+        "start": 7.217142857142857,
+        "end": 7.488571428571428,
+        "probability": 0.5
+      },
+      {
+        "word": "stuff.",
+        "start": 7.488571428571428,
+        "end": 7.76,
+        "probability": 0.5
+      },
+      {
+        "word": "if",
+        "start": 7.76,
+        "end": 8.26,
+        "probability": 0.5
+      },
+      {
+        "word": "there's",
+        "start": 8.26,
+        "end": 8.76,
+        "probability": 0.5
+      },
+      {
+        "word": "a",
+        "start": 8.76,
+        "end": 9.26,
+        "probability": 0.5
+      },
+      {
+        "word": "lot",
+        "start": 9.26,
+        "end": 9.76,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 9.76,
+        "end": 10.26,
+        "probability": 0.5
+      },
+      {
+        "word": "engagement.",
+        "start": 10.26,
+        "end": 10.76,
+        "probability": 0.5
+      }
+    ]
+  },
+  "processing_time": 26.19680094718933
+}

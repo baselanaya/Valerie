@@ -1,0 +1,452 @@
+{
+  "file": "data\\dev\\aac\\id00012\\21Uxsk56VDQ\\00002.m4a",
+  "audio_source": "data\\dev\\aac\\id00012\\21Uxsk56VDQ\\00002.m4a",
+  "status": "success",
+  "transcription": {
+    "text": "that kind of stuff happening. But Jimmy's also kind of on to this good Samaritan, this strange crime fighter who's saving people around Metropolis. He really believes in this. Nobody else seems to really believe him, but so he's hunting down this story and of course that would be Clark. So.",
+    "language": "en",
+    "duration": 0.0,
+    "segments": [
+      {
+        "id": 0,
+        "seek": 0,
+        "start": 0.0,
+        "end": 6.4,
+        "text": " that kind of stuff happening. But Jimmy's also kind of on to this good Samaritan,",
+        "tokens": [
+          300,
+          733,
+          295,
+          1507,
+          2737,
+          13,
+          583,
+          15709,
+          311,
+          611,
+          733,
+          295,
+          322,
+          281,
+          341,
+          665,
+          4832,
+          289,
+          9670,
+          11
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.3580349935612208,
+        "compression_ratio": 1.471794871794872,
+        "no_speech_prob": 0.23392744362354279
+      },
+      {
+        "id": 1,
+        "seek": 0,
+        "start": 6.4,
+        "end": 10.08,
+        "text": " this strange crime fighter who's saving people around Metropolis. He really believes in",
+        "tokens": [
+          341,
+          5861,
+          7206,
+          15932,
+          567,
+          311,
+          6816,
+          561,
+          926,
+          6377,
+          46470,
+          13,
+          634,
+          534,
+          12307,
+          294
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.3580349935612208,
+        "compression_ratio": 1.471794871794872,
+        "no_speech_prob": 0.23392744362354279
+      },
+      {
+        "id": 2,
+        "seek": 0,
+        "start": 10.08,
+        "end": 13.4,
+        "text": " this. Nobody else seems to really believe him, but so he's hunting down this story",
+        "tokens": [
+          341,
+          13,
+          9297,
+          1646,
+          2544,
+          281,
+          534,
+          1697,
+          796,
+          11,
+          457,
+          370,
+          415,
+          311,
+          12599,
+          760,
+          341,
+          1657
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.3580349935612208,
+        "compression_ratio": 1.471794871794872,
+        "no_speech_prob": 0.23392744362354279
+      },
+      {
+        "id": 3,
+        "seek": 1340,
+        "start": 13.4,
+        "end": 14.92,
+        "text": " and of course that would be Clark.",
+        "tokens": [
+          293,
+          295,
+          1164,
+          300,
+          576,
+          312,
+          18572,
+          13
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.649466069539388,
+        "compression_ratio": 0.8260869565217391,
+        "no_speech_prob": 0.059041935950517654
+      },
+      {
+        "id": 4,
+        "seek": 1492,
+        "start": 14.92,
+        "end": 15.42,
+        "text": " So.",
+        "tokens": [
+          50364,
+          407,
+          13,
+          50389
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.6706151962280273,
+        "compression_ratio": 0.2727272727272727,
+        "no_speech_prob": 0.33878299593925476
+      }
+    ],
+    "words": [
+      {
+        "word": "that",
+        "start": 0.0,
+        "end": 0.4266666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "kind",
+        "start": 0.4266666666666667,
+        "end": 0.8533333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 0.8533333333333334,
+        "end": 1.28,
+        "probability": 0.5
+      },
+      {
+        "word": "stuff",
+        "start": 1.28,
+        "end": 1.7066666666666668,
+        "probability": 0.5
+      },
+      {
+        "word": "happening.",
+        "start": 1.7066666666666668,
+        "end": 2.1333333333333333,
+        "probability": 0.5
+      },
+      {
+        "word": "But",
+        "start": 2.1333333333333333,
+        "end": 2.56,
+        "probability": 0.5
+      },
+      {
+        "word": "Jimmy's",
+        "start": 2.56,
+        "end": 2.986666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "also",
+        "start": 2.986666666666667,
+        "end": 3.4133333333333336,
+        "probability": 0.5
+      },
+      {
+        "word": "kind",
+        "start": 3.4133333333333336,
+        "end": 3.8400000000000003,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 3.8400000000000003,
+        "end": 4.266666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "on",
+        "start": 4.266666666666667,
+        "end": 4.693333333333333,
+        "probability": 0.5
+      },
+      {
+        "word": "to",
+        "start": 4.693333333333333,
+        "end": 5.12,
+        "probability": 0.5
+      },
+      {
+        "word": "this",
+        "start": 5.12,
+        "end": 5.546666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "good",
+        "start": 5.546666666666667,
+        "end": 5.973333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "Samaritan,",
+        "start": 5.973333333333334,
+        "end": 6.4,
+        "probability": 0.5
+      },
+      {
+        "word": "this",
+        "start": 6.4,
+        "end": 6.683076923076923,
+        "probability": 0.5
+      },
+      {
+        "word": "strange",
+        "start": 6.683076923076923,
+        "end": 6.966153846153846,
+        "probability": 0.5
+      },
+      {
+        "word": "crime",
+        "start": 6.966153846153847,
+        "end": 7.24923076923077,
+        "probability": 0.5
+      },
+      {
+        "word": "fighter",
+        "start": 7.24923076923077,
+        "end": 7.532307692307692,
+        "probability": 0.5
+      },
+      {
+        "word": "who's",
+        "start": 7.532307692307692,
+        "end": 7.815384615384615,
+        "probability": 0.5
+      },
+      {
+        "word": "saving",
+        "start": 7.815384615384616,
+        "end": 8.098461538461539,
+        "probability": 0.5
+      },
+      {
+        "word": "people",
+        "start": 8.098461538461539,
+        "end": 8.381538461538462,
+        "probability": 0.5
+      },
+      {
+        "word": "around",
+        "start": 8.381538461538462,
+        "end": 8.664615384615384,
+        "probability": 0.5
+      },
+      {
+        "word": "Metropolis.",
+        "start": 8.664615384615384,
+        "end": 8.947692307692307,
+        "probability": 0.5
+      },
+      {
+        "word": "He",
+        "start": 8.947692307692307,
+        "end": 9.23076923076923,
+        "probability": 0.5
+      },
+      {
+        "word": "really",
+        "start": 9.23076923076923,
+        "end": 9.513846153846153,
+        "probability": 0.5
+      },
+      {
+        "word": "believes",
+        "start": 9.513846153846155,
+        "end": 9.796923076923077,
+        "probability": 0.5
+      },
+      {
+        "word": "in",
+        "start": 9.796923076923077,
+        "end": 10.08,
+        "probability": 0.5
+      },
+      {
+        "word": "this.",
+        "start": 10.08,
+        "end": 10.301333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "Nobody",
+        "start": 10.301333333333334,
+        "end": 10.522666666666668,
+        "probability": 0.5
+      },
+      {
+        "word": "else",
+        "start": 10.522666666666666,
+        "end": 10.744,
+        "probability": 0.5
+      },
+      {
+        "word": "seems",
+        "start": 10.744,
+        "end": 10.965333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "to",
+        "start": 10.965333333333334,
+        "end": 11.186666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "really",
+        "start": 11.186666666666667,
+        "end": 11.408000000000001,
+        "probability": 0.5
+      },
+      {
+        "word": "believe",
+        "start": 11.408,
+        "end": 11.629333333333333,
+        "probability": 0.5
+      },
+      {
+        "word": "him,",
+        "start": 11.629333333333333,
+        "end": 11.850666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "but",
+        "start": 11.850666666666667,
+        "end": 12.072000000000001,
+        "probability": 0.5
+      },
+      {
+        "word": "so",
+        "start": 12.072000000000001,
+        "end": 12.293333333333335,
+        "probability": 0.5
+      },
+      {
+        "word": "he's",
+        "start": 12.293333333333333,
+        "end": 12.514666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "hunting",
+        "start": 12.514666666666667,
+        "end": 12.736,
+        "probability": 0.5
+      },
+      {
+        "word": "down",
+        "start": 12.736,
+        "end": 12.957333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "this",
+        "start": 12.957333333333334,
+        "end": 13.178666666666668,
+        "probability": 0.5
+      },
+      {
+        "word": "story",
+        "start": 13.178666666666667,
+        "end": 13.4,
+        "probability": 0.5
+      },
+      {
+        "word": "and",
+        "start": 13.4,
+        "end": 13.617142857142857,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 13.617142857142857,
+        "end": 13.834285714285715,
+        "probability": 0.5
+      },
+      {
+        "word": "course",
+        "start": 13.834285714285715,
+        "end": 14.051428571428572,
+        "probability": 0.5
+      },
+      {
+        "word": "that",
+        "start": 14.051428571428572,
+        "end": 14.268571428571429,
+        "probability": 0.5
+      },
+      {
+        "word": "would",
+        "start": 14.268571428571429,
+        "end": 14.485714285714286,
+        "probability": 0.5
+      },
+      {
+        "word": "be",
+        "start": 14.485714285714286,
+        "end": 14.702857142857143,
+        "probability": 0.5
+      },
+      {
+        "word": "Clark.",
+        "start": 14.702857142857143,
+        "end": 14.92,
+        "probability": 0.5
+      },
+      {
+        "word": "So.",
+        "start": 14.92,
+        "end": 15.42,
+        "probability": 0.5
+      }
+    ]
+  },
+  "processing_time": 28.605690956115723
+}

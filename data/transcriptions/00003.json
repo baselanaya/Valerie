@@ -1,0 +1,355 @@
+{
+  "file": "data\\dev\\aac\\id00012\\21Uxsk56VDQ\\00003.m4a",
+  "audio_source": "data\\dev\\aac\\id00012\\21Uxsk56VDQ\\00003.m4a",
+  "status": "success",
+  "transcription": {
+    "text": "as passive and stuff and kind of going after what he wants a little bit more. So yeah, but not entirely. Not entirely, I think it's a good balance though of being passive and actually going after what he wants.",
+    "language": "en",
+    "duration": 0.0,
+    "segments": [
+      {
+        "id": 0,
+        "seek": 0,
+        "start": 0.0,
+        "end": 4.16,
+        "text": " as passive and stuff and kind of going after what he wants a little bit more.",
+        "tokens": [
+          382,
+          14975,
+          293,
+          1507,
+          293,
+          733,
+          295,
+          516,
+          934,
+          437,
+          415,
+          2738,
+          257,
+          707,
+          857,
+          544,
+          13
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.3416599273681641,
+        "compression_ratio": 1.4848484848484849,
+        "no_speech_prob": 0.04016938433051109
+      },
+      {
+        "id": 1,
+        "seek": 0,
+        "start": 4.16,
+        "end": 5.16,
+        "text": " So yeah, but not entirely.",
+        "tokens": [
+          407,
+          1338,
+          11,
+          457,
+          406,
+          7696,
+          13
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.3416599273681641,
+        "compression_ratio": 1.4848484848484849,
+        "no_speech_prob": 0.04016938433051109
+      },
+      {
+        "id": 2,
+        "seek": 516,
+        "start": 5.16,
+        "end": 9.16,
+        "text": " Not entirely, I think it's a good balance though of being passive and actually going",
+        "tokens": [
+          1726,
+          7696,
+          11,
+          286,
+          519,
+          309,
+          311,
+          257,
+          665,
+          4772,
+          1673,
+          295,
+          885,
+          14975,
+          293,
+          767,
+          516
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.3062770631578233,
+        "compression_ratio": 1.141304347826087,
+        "no_speech_prob": 0.004534618463367224
+      },
+      {
+        "id": 3,
+        "seek": 916,
+        "start": 9.16,
+        "end": 11.72,
+        "text": " after what he wants.",
+        "tokens": [
+          50364,
+          934,
+          437,
+          415,
+          2738,
+          13,
+          50492
+        ],
+        "temperature": 0.0,
+        "avg_logprob": -0.5779123902320862,
+        "compression_ratio": 0.7142857142857143,
+        "no_speech_prob": 0.01880299672484398
+      }
+    ],
+    "words": [
+      {
+        "word": "as",
+        "start": 0.0,
+        "end": 0.26,
+        "probability": 0.5
+      },
+      {
+        "word": "passive",
+        "start": 0.26,
+        "end": 0.52,
+        "probability": 0.5
+      },
+      {
+        "word": "and",
+        "start": 0.52,
+        "end": 0.78,
+        "probability": 0.5
+      },
+      {
+        "word": "stuff",
+        "start": 0.78,
+        "end": 1.04,
+        "probability": 0.5
+      },
+      {
+        "word": "and",
+        "start": 1.04,
+        "end": 1.3,
+        "probability": 0.5
+      },
+      {
+        "word": "kind",
+        "start": 1.3,
+        "end": 1.56,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 1.56,
+        "end": 1.82,
+        "probability": 0.5
+      },
+      {
+        "word": "going",
+        "start": 1.82,
+        "end": 2.08,
+        "probability": 0.5
+      },
+      {
+        "word": "after",
+        "start": 2.08,
+        "end": 2.34,
+        "probability": 0.5
+      },
+      {
+        "word": "what",
+        "start": 2.34,
+        "end": 2.5999999999999996,
+        "probability": 0.5
+      },
+      {
+        "word": "he",
+        "start": 2.6,
+        "end": 2.8600000000000003,
+        "probability": 0.5
+      },
+      {
+        "word": "wants",
+        "start": 2.8600000000000003,
+        "end": 3.12,
+        "probability": 0.5
+      },
+      {
+        "word": "a",
+        "start": 3.12,
+        "end": 3.38,
+        "probability": 0.5
+      },
+      {
+        "word": "little",
+        "start": 3.38,
+        "end": 3.6399999999999997,
+        "probability": 0.5
+      },
+      {
+        "word": "bit",
+        "start": 3.64,
+        "end": 3.9000000000000004,
+        "probability": 0.5
+      },
+      {
+        "word": "more.",
+        "start": 3.9000000000000004,
+        "end": 4.16,
+        "probability": 0.5
+      },
+      {
+        "word": "So",
+        "start": 4.16,
+        "end": 4.36,
+        "probability": 0.5
+      },
+      {
+        "word": "yeah,",
+        "start": 4.36,
+        "end": 4.5600000000000005,
+        "probability": 0.5
+      },
+      {
+        "word": "but",
+        "start": 4.5600000000000005,
+        "end": 4.760000000000001,
+        "probability": 0.5
+      },
+      {
+        "word": "not",
+        "start": 4.76,
+        "end": 4.96,
+        "probability": 0.5
+      },
+      {
+        "word": "entirely.",
+        "start": 4.96,
+        "end": 5.16,
+        "probability": 0.5
+      },
+      {
+        "word": "Not",
+        "start": 5.16,
+        "end": 5.426666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "entirely,",
+        "start": 5.426666666666667,
+        "end": 5.693333333333333,
+        "probability": 0.5
+      },
+      {
+        "word": "I",
+        "start": 5.693333333333333,
+        "end": 5.96,
+        "probability": 0.5
+      },
+      {
+        "word": "think",
+        "start": 5.96,
+        "end": 6.226666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "it's",
+        "start": 6.226666666666667,
+        "end": 6.493333333333333,
+        "probability": 0.5
+      },
+      {
+        "word": "a",
+        "start": 6.493333333333333,
+        "end": 6.76,
+        "probability": 0.5
+      },
+      {
+        "word": "good",
+        "start": 6.76,
+        "end": 7.026666666666666,
+        "probability": 0.5
+      },
+      {
+        "word": "balance",
+        "start": 7.026666666666667,
+        "end": 7.293333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "though",
+        "start": 7.293333333333333,
+        "end": 7.56,
+        "probability": 0.5
+      },
+      {
+        "word": "of",
+        "start": 7.5600000000000005,
+        "end": 7.826666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "being",
+        "start": 7.826666666666666,
+        "end": 8.093333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "passive",
+        "start": 8.093333333333334,
+        "end": 8.360000000000001,
+        "probability": 0.5
+      },
+      {
+        "word": "and",
+        "start": 8.36,
+        "end": 8.626666666666667,
+        "probability": 0.5
+      },
+      {
+        "word": "actually",
+        "start": 8.626666666666667,
+        "end": 8.893333333333334,
+        "probability": 0.5
+      },
+      {
+        "word": "going",
+        "start": 8.893333333333334,
+        "end": 9.160000000000002,
+        "probability": 0.5
+      },
+      {
+        "word": "after",
+        "start": 9.16,
+        "end": 9.8,
+        "probability": 0.5
+      },
+      {
+        "word": "what",
+        "start": 9.8,
+        "end": 10.440000000000001,
+        "probability": 0.5
+      },
+      {
+        "word": "he",
+        "start": 10.440000000000001,
+        "end": 11.080000000000002,
+        "probability": 0.5
+      },
+      {
+        "word": "wants.",
+        "start": 11.08,
+        "end": 11.72,
+        "probability": 0.5
+      }
+    ]
+  },
+  "processing_time": 26.745789051055908
+}
