@@ -1,0 +1,204 @@
+================================================================================
+VALERIE CODEBASE - OBSOLETE FILES AUDIT (QUICK REFERENCE)
+================================================================================
+
+CRITICAL FINDINGS:
+================================================================================
+
+1. VIDEO PROCESSING FILES (DELETE - 418 + 1317 + 557 = 2,292 lines obsolete)
+   ❌ src/models/spatio_temporal.py (418 lines)
+      - 3D CNN for video frames, no longer needed
+      - Replaced by: AudioFrontend (Mel spectrograms)
+   
+   ❌ src/data/dataset.py (PARTIALLY - 1,317 lines)
+      - VoxCeleb2Dataset, AVSpeechDataset (video-based)
+      - EnhancedVoxCeleb2Dataset (video-based with transcriptions)
+      - All use: _load_video_frames, _extract_face_region, extract_lip_region
+      - Replaced by: LibriSpeech dataset loader (audio-only)
+   
+   ❌ src/data/transforms.py (PARTIALLY - VideoTransforms ~166 lines)
+      - VideoTransforms class for lip reading augmentation
+      - Replaced by: AudioTransforms (already in same file)
+
+2. REDUNDANT/OLD DISTILLATION (DELETE)
+   ❌ src/models/audio_distillation.py (557 lines)
+      - Single Whisper teacher, designed for video model
+      - Replaced by: ensemble_distillation.py (3 teachers: Whisper, Wav2Vec2, HuBERT)
+      - Used only by: old ValerieModel (video-based)
+
+3. REDUNDANT VIDEO MODEL (KEEP for now, but not used)
+   ⚠️  src/models/valerie_model.py (360 lines)
+      - Still imported by: old tests and training scripts
+      - Expects video input [B, C, T, H, W]
+      - Replaced by: AudioPhonemeASR (audio-based)
+      - MIGRATE tests, then can be archived
+
+4. VIDEO-BASED CONFIGS (DELETE/UPDATE)
+   ❌ configs/base_config.yaml
+      - 3D CNN config, video parameters (224x224, frame_rate: 25)
+      - Replaced by: ensemble_distillation_config.yaml
+   
+   ❌ configs/avspeech_config.yaml
+      - AVSpeech dataset (YouTube videos), audio-visual sync
+      - Deleted in audio-only system
+   
+   ❌ configs/voxceleb2_config.yaml
+      - VoxCeleb2 dataset (video), speaker adaptation
+      - Deleted in audio-only system
+   
+   ⚠️  configs/multi_gpu_config.yaml
+      - References video config, video_size: [224, 224]
+      - UPDATE to use ensemble_distillation_config.yaml
+
+5. OLD TRAINING SCRIPTS (DELETE)
+   ❌ scripts/train.py
+      - Generic old pipeline for ValerieModel
+   
+   ❌ scripts/train_two_stage.py
+      - Video→Phonemes, then Phonemes→Text (old approach)
+      - Uses ValerieModel (video)
+   
+   ❌ train_multi_gpu.py (root level)
+      - Old multi-GPU training for video model
+
+6. TESTS TESTING OBSOLETE FUNCTIONALITY (~35% of test code)
+   ⚠️  test_mandatory_components.py
+      - Tests ValerieModel with video [B, C, T, H, W]
+      - UPDATE to test AudioPhonemeASR with audio
+   
+   ⚠️  test_integration.py (~40% obsolete)
+      - generate_video_data(), video batch handling
+      - test_video_to_phonemes_pipeline()
+      - REMOVE video tests, keep integration tests
+   
+   ⚠️  test_models.py (~30% obsolete)
+      - TestSpatioTemporalEmbedding class (entire class obsolete)
+      - test_video_to_phonemes_pipeline()
+      - test_spatio_temporal_performance()
+      - REMOVE spatio-temporal tests
+   
+   ⚠️  test_model_components.py (~70% obsolete)
+      - 10+ spatio-temporal tests
+      - test_conv3d_block(), test_temporal_positional_encoding(), etc.
+      - REMOVE all spatio-temporal tests
+   
+   ⚠️  test_components.py
+      - Imports and tests SpatioTemporalEmbedding
+      - REMOVE spatio-temporal tests
+   
+   ⚠️  test_dataset_pipeline.py (~40% obsolete)
+      - VideoTransforms tests
+      - Video batch handling tests
+      - REMOVE video-specific tests
+
+7. TOOLS STILL USING OLD MODELS (UPDATE)
+   ⚠️  src/inference/inference_engine.py
+      - Uses ValerieModel (video)
+      - UPDATE to use AudioPhonemeASR
+   
+   ⚠️  src/visualization/model_analysis.py
+      - Analyzes ValerieModel
+      - UPDATE to analyze new models
+   
+   ⚠️  examples/multi_gpu_training_comparison.py
+      - Compares old training approaches
+      - DELETE or update
+
+RECOMMENDED CLEANUP SEQUENCE:
+================================================================================
+
+PHASE 1 - DELETE OBSOLETE FILES (Direct cleanup):
+  1. Delete src/models/spatio_temporal.py
+  2. Delete src/models/audio_distillation.py
+  3. Delete configs/base_config.yaml
+  4. Delete configs/avspeech_config.yaml
+  5. Delete configs/voxceleb2_config.yaml
+  6. Delete scripts/train.py
+  7. Delete scripts/train_two_stage.py
+  8. Delete train_multi_gpu.py
+
+PHASE 2 - REFACTOR FILES (Remove obsolete code):
+  1. Update src/models/__init__.py:
+     - Remove: SpatioTemporalEmbedding, Conv3dBlock
+     - Remove: AudioKnowledgeDistillation, WhisperTeacher, CrossModalAlignment
+  
+  2. Update src/data/dataset.py:
+     - Remove: VoxCeleb2Dataset class (entire)
+     - Remove: AVSpeechDataset class (entire)
+     - Remove: EnhancedVoxCeleb2Dataset class (entire)
+     - Remove: Video loading methods
+     - Add: LibriSpeech audio dataset loader
+  
+  3. Update src/data/transforms.py:
+     - Remove: VideoTransforms class
+     - Keep: AudioTransforms, DataAugmentationPipeline
+  
+  4. Update configs/multi_gpu_config.yaml:
+     - Reference ensemble_distillation_config.yaml instead
+     - Remove video_size, video parameters
+
+PHASE 3 - MIGRATE TESTS (Update test suite):
+  1. Update test_mandatory_components.py:
+     - Test AudioPhonemeASR instead of ValerieModel
+     - Use audio input instead of video
+  
+  2. Update test_integration.py:
+     - Remove: generate_video_data()
+     - Remove: video-specific test methods
+     - Keep: other integration tests
+  
+  3. Update test_models.py:
+     - Remove: TestSpatioTemporalEmbedding class
+     - Remove: test_video_to_phonemes_pipeline()
+  
+  4. Update test_model_components.py:
+     - Remove: All spatio-temporal tests (~70%)
+     - Keep: Conformer, CTC/Attention tests
+  
+  5. Update test_components.py:
+     - Remove: Spatio-temporal imports and tests
+  
+  6. Update test_dataset_pipeline.py:
+     - Remove: VideoTransforms tests
+     - Update: Dataset tests to use audio datasets
+
+PHASE 4 - UPDATE TOOLS (Update auxiliary code):
+  1. Update src/inference/inference_engine.py:
+     - Switch from ValerieModel to AudioPhonemeASR
+  
+  2. Update src/visualization/model_analysis.py:
+     - Analyze new models instead of ValerieModel
+  
+  3. Delete examples/multi_gpu_training_comparison.py
+     - Create new comparison for audio-only approach
+
+ARCHIVE FOR REFERENCE:
+================================================================================
+Create: legacy/
+  - Archive old configs
+  - Archive old training scripts
+  - Document migration path
+
+USAGE:
+================================================================================
+
+NEW CORRECT APPROACH:
+  - Config: configs/ensemble_distillation_config.yaml
+  - Model: src/models/audio_phoneme_model.py (AudioPhonemeASR)
+  - Training: scripts/train_stage1_phoneme_asr.py
+  - Distillation: src/models/ensemble_distillation.py (3 teachers)
+  - Dataset: LibriSpeech (via Hugging Face datasets)
+
+TOTAL OBSOLETE CODE:
+  - Deletable: ~2,800 lines (spatio_temporal, audio_distillation, old datasets)
+  - Removable from files: ~1,500+ lines (VideoTransforms, video configs, old tests)
+  - Total cleanup potential: ~4,300+ lines
+
+IMPACT:
+  - Reduces technical debt significantly
+  - Clarifies codebase (no more video/audio confusion)
+  - Improves maintainability
+  - Reduces test complexity by ~35%
+  - Makes migration path clear for other developers
+
+================================================================================
