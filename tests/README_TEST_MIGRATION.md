@@ -2,37 +2,31 @@
 
 ## ✅ Updated Tests (Audio-Only)
 
-- **test_mandatory_components.py** - Fully migrated to AudioPhonemeASR
+- **test_mandatory_components.py** - Fully migrated to AudioPhonemeASR (Phase 3)
+- **test_models.py** - Fully migrated to audio-only architecture (Phase 5)
+- **test_integration.py** - Fully migrated to audio-only tests (Phase 5)
 
 ## ⚠️ Tests Needing Migration (Video-Based)
 
-The following tests still use video-based ValerieModel and need migration:
+The following tests still use video-based components and need migration:
 
-### test_models.py
-- Contains TestSpatioTemporalEmbedding class (obsolete)
-- Tests video→phonemes pipeline
-- **Action:** Remove spatio-temporal tests, add AudioPhonemeASR tests
-
-### test_model_components.py  
+### test_model_components.py
 - 70% of tests are spatio-temporal (obsolete)
 - Tests Conv3dBlock, TemporalPositionalEncoding, etc.
 - **Action:** Remove video component tests, keep Conformer/CTC tests
+- **Priority:** Medium
 
 ### test_components.py
 - Imports SpatioTemporalEmbedding (obsolete)
 - Tests video components
 - **Action:** Remove spatio-temporal imports/tests
-
-### test_integration.py
-- 40% video-specific tests
-- generate_video_data() function
-- test_video_to_phonemes_pipeline()
-- **Action:** Remove video tests, keep audio integration tests
+- **Priority:** Low
 
 ### test_dataset_pipeline.py
 - 40% VideoTransforms tests (obsolete)
 - Video batch handling
 - **Action:** Remove VideoTransforms tests, add audio tests
+- **Priority:** Medium
 
 ## Migration Guide
 
@@ -60,14 +54,14 @@ To update a test file:
 
 ## Test Priority
 
-**High Priority:**
-- test_models.py - Core model tests
-- test_integration.py - End-to-end pipeline
+**✅ High Priority (COMPLETED):**
+- ✅ test_models.py - Core model tests (Phase 5)
+- ✅ test_integration.py - End-to-end pipeline (Phase 5)
 
 **Medium Priority:**
 - test_model_components.py - Component unit tests
 - test_dataset_pipeline.py - Data pipeline
 
-**Low Priority:**  
+**Low Priority:**
 - test_components.py - Individual component tests
 
