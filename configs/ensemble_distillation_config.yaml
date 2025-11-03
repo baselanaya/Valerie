@@ -1,0 +1,158 @@
+# Configuration for Ensemble Distillation Phoneme ASR
+# Two-stage architecture: Audio → Phonemes → Text
+# With knowledge distillation from 3 teacher models
+
+# Experiment settings
+experiment:
+  name: "ensemble_distillation_phoneme_asr"
+  description: "Audio-only ASR with ensemble distillation from 3 teachers"
+  seed: 42
+
+# Audio settings
+audio:
+  sample_rate: 16000
+  n_fft: 400
+  hop_length: 160
+  n_mels: 80
+  use_specaugment: true
+  spec_augment_config:
+    freq_mask_param: 27
+    time_mask_param: 100
+    n_freq_masks: 2
+    n_time_masks: 2
+
+# Model architecture
+model:
+  # Student model (reduced size)
+  embed_dim: 256           # Reduced from 512
+  conformer_layers: 12     # Reduced from 16
+  conformer_heads: 4       # Optimized for 256 dim
+  conv_kernel_size: 31
+  ffn_expansion_factor: 4
+  dropout: 0.1
+  vocab_size: 40           # 39 phonemes + blank
+  decoder_dim: 256
+
+  # LLM settings
+  llm_model_name: "Qwen/Qwen2-0.6B"
+  lora_rank: 16
+  lora_alpha: 32
+  max_new_tokens: 256
+
+# Ensemble distillation settings
+distillation:
+  enable: true
+  warmup_epochs: 5         # Train without distillation first
+
+  # Three teacher models
+  teachers:
+    - model_name: "openai/whisper-large-v3"
+      model_type: "whisper"
+      weight: 0.4
+      feature_layer: -1
+      freeze: true
+      extract_phoneme_logits: true
+
+    - model_name: "facebook/wav2vec2-large-960h-lv60-self"
+      model_type: "wav2vec2"
+      weight: 0.3
+      feature_layer: -1
+      freeze: true
+      extract_phoneme_logits: true
+
+    - model_name: "facebook/hubert-large-ls960-ft"
+      model_type: "hubert"
+      weight: 0.3
+      feature_layer: -1
+      freeze: true
+      extract_phoneme_logits: true
+
+  # Distillation parameters
+  projection_dim: 512
+  temperature: 4.0
+  aggregation_method: "weighted_average"
+  feature_matching_loss: "mse"
+  soft_label_loss: "kl_div"
+
+# Data settings
+data:
+  # LibriSpeech dataset
+  librispeech_root: "./data/librispeech"
+  train_split: "train-clean-100"  # 100 hours
+  val_split: "dev-clean"
+  test_split: "test-clean"
+  download: true
+
+  # Text datasets for Stage 2
+  text_datasets:
+    - "wikitext-103-v1"
+    - "bookcorpus"
+  max_samples: 100000
+
+  # Error injection for Stage 2
+  error_config:
+    substitution_prob: 0.05
+    deletion_prob: 0.05
+    insertion_prob: 0.05
+    max_error_rate: 0.15
+
+# Training settings
+training:
+  # Stage 1: Audio → Phonemes
+  num_epochs: 50
+  batch_size: 16            # Adjust based on GPU memory
+  val_batch_size: 32
+  num_workers: 4
+
+  # Optimizer
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-2
+  warmup_steps: 1000
+  total_steps: 50000
+
+  # Loss weights
+  ctc_weight: 1.0
+  attention_weight: 0.3
+  distillation_weight: 0.5
+
+  # Mixed precision
+  use_amp: true
+
+  # Checkpointing
+  checkpoint_dir: "./checkpoints/ensemble_distillation"
+  save_every_n_epochs: 5
+  keep_last_n_checkpoints: 3
+
+# Logging settings
+logging:
+  use_wandb: true
+  wandb_project: "valerie-ensemble-distillation"
+  experiment_name: "stage1_audio_to_phonemes"
+  log_every_n_steps: 100
+
+# Stage 2 specific settings
+stage2:
+  num_epochs: 20
+  batch_size: 32
+  learning_rate: 5.0e-5
+  max_length: 512
+
+# Stage 3 specific settings
+stage3:
+  num_epochs: 10
+  batch_size: 8
+  learning_rate: 1.0e-5
+  fine_tune_hours: 10
+
+# Hardware settings
+hardware:
+  gpu_ids: [0]              # GPU IDs to use
+  distributed: false        # Enable for multi-GPU
+  mixed_precision: "fp16"
+
+# Performance targets
+targets:
+  stage1_per: 0.35          # <35% PER for Stage 1
+  stage2_accuracy: 0.95     # >95% reconstruction for Stage 2
+  stage3_wer: 0.12          # <12% WER for end-to-end
+  optimized_wer: 0.08       # <8% WER optimized
