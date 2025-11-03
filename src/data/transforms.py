@@ -1,8 +1,8 @@
 """
-Data augmentation and preprocessing transforms for Valerie Visual ASR.
+Data augmentation and preprocessing transforms for Valerie Audio-Only ASR.
 
-Implements video and audio augmentations that preserve lip reading content
-while improving model robustness.
+Implements audio augmentations for phoneme-based ASR that improve
+model robustness while preserving phonetic content.
 """
 
 import torch
@@ -19,173 +19,6 @@ import librosa
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
-
-
-class VideoTransforms:
-    """Video-specific transforms for lip reading."""
-    
-    def __init__(
-        self,
-        target_height: int = 224,
-        target_width: int = 224,
-        horizontal_flip_prob: float = 0.5,
-        brightness_range: float = 0.2,
-        contrast_range: float = 0.2,
-        noise_std: float = 0.01,
-        temporal_crop_prob: float = 0.3,
-        normalize: bool = True
-    ):
-        """
-        Initialize video transforms.
-        
-        Args:
-            target_height: Target frame height
-            target_width: Target frame width
-            horizontal_flip_prob: Probability of horizontal flipping
-            brightness_range: Brightness adjustment range
-            contrast_range: Contrast adjustment range
-            noise_std: Standard deviation for Gaussian noise
-            temporal_crop_prob: Probability of temporal cropping
-            normalize: Whether to normalize to [0, 1]
-        """
-        self.target_height = target_height
-        self.target_width = target_width
-        self.horizontal_flip_prob = horizontal_flip_prob
-        self.brightness_range = brightness_range
-        self.contrast_range = contrast_range
-        self.noise_std = noise_std
-        self.temporal_crop_prob = temporal_crop_prob
-        self.normalize = normalize
-        
-        # Create spatial augmentation pipeline
-        self.spatial_transforms = A.Compose([
-            A.Resize(target_height, target_width),
-            A.HorizontalFlip(p=horizontal_flip_prob),
-            A.RandomBrightnessContrast(
-                brightness_limit=brightness_range,
-                contrast_limit=contrast_range,
-                p=0.7
-            ),
-            A.GaussNoise(var_limit=(0.0, noise_std**2), p=0.3),
-            A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]) if normalize else A.NoOp(),
-        ])
-        
-        logger.info(f"✅ VideoTransforms initialized:")
-        logger.info(f"   Target size: {target_height}x{target_width}")
-        logger.info(f"   Horizontal flip: {horizontal_flip_prob}")
-        logger.info(f"   Brightness/Contrast: ±{brightness_range:.2f}")
-        logger.info(f"   Noise std: {noise_std}")
-    
-    def __call__(self, video_frames: torch.Tensor, training: bool = True) -> torch.Tensor:
-        """
-        Apply video transforms.
-        
-        Args:
-            video_frames: Video tensor [T, H, W, C] or [T, C, H, W]
-            training: Whether in training mode
-            
-        Returns:
-            Transformed video tensor
-        """
-        if not training:
-            # Only resize during inference
-            return self.resize_only(video_frames)
-        
-        # Ensure correct format [T, H, W, C]
-        if video_frames.dim() == 4 and video_frames.shape[1] == 3:
-            video_frames = video_frames.permute(0, 2, 3, 1)  # [T, C, H, W] -> [T, H, W, C]
-        
-        # Apply temporal cropping
-        if random.random() < self.temporal_crop_prob:
-            video_frames = self.temporal_crop(video_frames)
-        
-        # Apply spatial transforms frame by frame
-        transformed_frames = []
-        for frame in video_frames:
-            # Convert to numpy for albumentations
-            frame_np = frame.numpy() if isinstance(frame, torch.Tensor) else frame
-            
-            # Ensure uint8 format for albumentations
-            if frame_np.dtype != np.uint8:
-                frame_np = (frame_np * 255).astype(np.uint8)
-            
-            # Apply transforms
-            transformed = self.spatial_transforms(image=frame_np)['image']
-            
-            # Convert back to tensor
-            if isinstance(transformed, np.ndarray):
-                transformed = torch.from_numpy(transformed)
-            
-            transformed_frames.append(transformed)
-        
-        # Stack frames
-        result = torch.stack(transformed_frames)
-        
-        # Ensure correct output format [T, H, W, C]
-        if result.dim() == 4 and result.shape[-1] != 3:
-            result = result.permute(0, 2, 3, 1)
-        
-        return result
-    
-    def resize_only(self, video_frames: torch.Tensor) -> torch.Tensor:
-        """Apply only resizing (for inference)."""
-        # Ensure correct format
-        if video_frames.dim() == 4 and video_frames.shape[1] == 3:
-            video_frames = video_frames.permute(0, 2, 3, 1)
-        
-        resized_frames = []
-        for frame in video_frames:
-            frame_np = frame.numpy() if isinstance(frame, torch.Tensor) else frame
-            if frame_np.dtype != np.uint8:
-                frame_np = (frame_np * 255).astype(np.uint8)
-            
-            resized = cv2.resize(frame_np, (self.target_width, self.target_height))
-            
-            if self.normalize:
-                resized = resized.astype(np.float32) / 255.0
-                resized = (resized - 0.5) / 0.5  # Normalize to [-1, 1]
-            
-            resized_frames.append(torch.from_numpy(resized))
-        
-        return torch.stack(resized_frames)
-    
-    def temporal_crop(self, video_frames: torch.Tensor, min_ratio: float = 0.8) -> torch.Tensor:
-        """Apply temporal cropping to video sequence."""
-        T = video_frames.shape[0]
-        
-        # Random crop length (at least min_ratio of original)
-        crop_length = random.randint(int(T * min_ratio), T)
-        
-        # Random start position
-        start_idx = random.randint(0, T - crop_length)
-        
-        return video_frames[start_idx:start_idx + crop_length]
-    
-    def mixup_frames(
-        self, 
-        video1: torch.Tensor, 
-        video2: torch.Tensor, 
-        alpha: float = 0.2
-    ) -> torch.Tensor:
-        """Apply mixup augmentation between two video sequences."""
-        # Sample mixing coefficient
-        lam = np.random.beta(alpha, alpha)
-        
-        # Ensure same length (pad shorter one)
-        T1, T2 = video1.shape[0], video2.shape[0]
-        if T1 != T2:
-            T_max = max(T1, T2)
-            if T1 < T_max:
-                padding = torch.zeros(T_max - T1, *video1.shape[1:])
-                video1 = torch.cat([video1, padding], dim=0)
-            if T2 < T_max:
-                padding = torch.zeros(T_max - T2, *video2.shape[1:])
-                video2 = torch.cat([video2, padding], dim=0)
-        
-        # Mix videos
-        mixed_video = lam * video1 + (1 - lam) * video2
-        
-        return mixed_video, lam
 
 
 class AudioTransforms:
@@ -392,33 +225,28 @@ class MixupAugmentation:
 
 
 class DataAugmentationPipeline:
-    """Complete data augmentation pipeline for Valerie."""
-    
+    """
+    Audio-only data augmentation pipeline for Valerie.
+
+    Note: Video transforms removed. For audio augmentation, use AudioFrontend
+    with SpecAugment directly, which is more efficient.
+    """
+
     def __init__(self, config, training: bool = True):
         """
         Initialize augmentation pipeline from configuration.
-        
+
         Args:
             config: Configuration object
             training: Whether pipeline is for training
         """
         self.training = training
-        
-        # Video transforms
-        self.video_transforms = VideoTransforms(
-            target_height=config.model.input_height,
-            target_width=config.model.input_width,
-            horizontal_flip_prob=config.data.horizontal_flip_prob,
-            brightness_range=config.data.brightness_range,
-            contrast_range=config.data.contrast_range,
-            noise_std=config.data.noise_std
-        )
-        
-        # Audio transforms
+
+        # Audio transforms (video transforms removed)
         self.audio_transforms = AudioTransforms(
             sample_rate=config.data.audio_sample_rate
         )
-        
+
         # Mixup augmentation
         if training:
             self.mixup = MixupAugmentation(
@@ -427,62 +255,46 @@ class DataAugmentationPipeline:
             )
         else:
             self.mixup = None
-        
-        logger.info(f"✅ DataAugmentationPipeline initialized (training={training})")
+
+        logger.info(f"✅ DataAugmentationPipeline initialized (audio-only, training={training})")
     
     def __call__(self, data) -> Union[Dict[str, Any], 'DataSample']:
-        """Apply full augmentation pipeline to batch or single sample."""
-        
-        # Handle DataSample objects
-        if hasattr(data, 'video_frames'):
+        """Apply audio-only augmentation pipeline to batch or single sample."""
+
+        # Handle DataSample objects (audio-only)
+        if hasattr(data, 'audio_waveform'):
             from src.data.dataset import DataSample
-            
-            # Apply video transforms
-            if data.video_frames is not None:
-                transformed_video = self.video_transforms(
-                    data.video_frames, 
-                    training=self.training
-                )
-            else:
-                transformed_video = data.video_frames
-            
+
             # Apply audio transforms
             if data.audio_waveform is not None:
                 transformed_audio = self.audio_transforms(
-                    data.audio_waveform, 
+                    data.audio_waveform,
                     training=self.training
                 )
             else:
                 transformed_audio = data.audio_waveform
-            
-            # Create new DataSample with transformed data
+
+            # Create new DataSample with transformed audio (video fields removed)
             return DataSample(
-                video_frames=transformed_video,
+                video_frames=None,  # Video removed
                 audio_waveform=transformed_audio,
-                video_path=data.video_path,
-                audio_path=data.audio_path,
-                transcription=data.transcription,
-                phoneme_sequence=data.phoneme_sequence,
-                phoneme_alignment=data.phoneme_alignment,
-                speaker_id=data.speaker_id,
-                language=data.language,
-                duration=data.duration,
-                face_confidence=data.face_confidence,
-                transcription_confidence=data.transcription_confidence
+                video_path=None,
+                audio_path=data.audio_path if hasattr(data, 'audio_path') else None,
+                transcription=data.transcription if hasattr(data, 'transcription') else None,
+                phoneme_sequence=data.phoneme_sequence if hasattr(data, 'phoneme_sequence') else None,
+                phoneme_alignment=data.phoneme_alignment if hasattr(data, 'phoneme_alignment') else None,
+                speaker_id=data.speaker_id if hasattr(data, 'speaker_id') else None,
+                language=data.language if hasattr(data, 'language') else None,
+                duration=data.duration if hasattr(data, 'duration') else None,
+                face_confidence=None,  # Video removed
+                transcription_confidence=data.transcription_confidence if hasattr(data, 'transcription_confidence') else None
             )
-        
-        # Handle dictionary/batch data
+
+        # Handle dictionary/batch data (audio-only)
         elif isinstance(data, dict):
             batch_data = data.copy()
-            
-            # Apply video transforms
-            if 'video_frames' in batch_data:
-                batch_data['video_frames'] = self.video_transforms(
-                    batch_data['video_frames'], 
-                    training=self.training
-                )
-            
-            # Apply audio transforms
+
+            # Apply audio transforms (video processing removed)
             if 'audio_waveforms' in batch_data:
                 transformed_audio = []
                 for audio in batch_data['audio_waveforms']:
@@ -490,14 +302,14 @@ class DataAugmentationPipeline:
                         self.audio_transforms(audio, training=self.training)
                     )
                 batch_data['audio_waveforms'] = torch.stack(transformed_audio)
-            
+
             # Apply mixup (only during training)
             if self.training and self.mixup is not None:
                 batch_data, mixup_lambdas = self.mixup(batch_data)
                 batch_data['mixup_lambdas'] = mixup_lambdas
-            
+
             return batch_data
-        
+
         else:
             raise TypeError(f"Expected DataSample or dict, got {type(data)}")
 
@@ -509,39 +321,38 @@ def create_augmentation_pipeline(config, training: bool = True) -> DataAugmentat
 
 
 if __name__ == "__main__":
-    # Test transforms
+    # Test audio-only transforms
     from src.utils.config import Config
-    
-    config = Config("configs/base_config.yaml")
-    
-    # Test video transforms
-    print("Testing video transforms...")
-    video_transforms = VideoTransforms()
-    dummy_video = torch.randn(10, 224, 224, 3)  # 10 frames
-    
-    transformed = video_transforms(dummy_video, training=True)
-    print(f"Video: {dummy_video.shape} -> {transformed.shape}")
-    
+
+    print("🧪 Testing audio-only transforms...")
+
     # Test audio transforms
-    print("\nTesting audio transforms...")
+    print("\n1️⃣ Testing AudioTransforms...")
     audio_transforms = AudioTransforms()
     dummy_audio = torch.randn(16000)  # 1 second at 16kHz
-    
+
     transformed_audio = audio_transforms(dummy_audio, training=True)
-    print(f"Audio: {dummy_audio.shape} -> {transformed_audio.shape}")
-    
-    # Test augmentation pipeline
-    print("\nTesting augmentation pipeline...")
+    print(f"   Audio: {dummy_audio.shape} -> {transformed_audio.shape}")
+
+    # Test augmentation pipeline (audio-only)
+    print("\n2️⃣ Testing DataAugmentationPipeline (audio-only)...")
+
+    # Create minimal config for testing
+    class SimpleConfig:
+        class data:
+            audio_sample_rate = 16000
+            mixup_alpha = 0.2
+
+    config = SimpleConfig()
+
     pipeline = create_augmentation_pipeline(config, training=True)
-    
+
     batch_data = {
-        'video_frames': torch.randn(2, 10, 224, 224, 3),
         'audio_waveforms': torch.randn(2, 16000)
     }
-    
+
     augmented = pipeline(batch_data)
-    print(f"Pipeline applied successfully!")
-    print(f"  Video shape: {augmented['video_frames'].shape}")
-    print(f"  Audio shape: {augmented['audio_waveforms'].shape}")
-    
-    print("\n✅ Transform tests completed!")
+    print(f"   Pipeline applied successfully!")
+    print(f"   Audio shape: {augmented['audio_waveforms'].shape}")
+
+    print("\n✅ Audio-only transform tests completed!")

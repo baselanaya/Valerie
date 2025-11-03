@@ -1,5 +1,6 @@
-# Multi-GPU Training Configuration for Valerie Visual ASR
+# Multi-GPU Training Configuration for Valerie Audio-Only ASR
 # Optimized for single machine with 2-8 GPUs
+# Uses ensemble distillation with 3 teachers
 
 # Training method selection
 training_method: "ddp"  # ddp, accelerate
@@ -8,10 +9,10 @@ training_method: "ddp"  # ddp, accelerate
 gpu:
   # GPU IDs to use (null = all available)
   gpu_ids: null  # [0, 1, 2, 3] or null for all
-  
+
   # Mixed precision training
   mixed_precision: "fp16"  # fp16, bf16, fp32
-  
+
   # Memory optimization
   gradient_checkpointing: false  # Trade compute for memory
   max_memory_per_gpu: 0.9  # Use 90% of GPU memory
@@ -19,28 +20,28 @@ gpu:
 # Training Configuration
 training:
   # Batch size per GPU (total = batch_size * num_gpus)
-  batch_size: 8
-  
+  batch_size: 16  # Increased from 8 (audio-only, smaller model)
+
   # Learning rate (will be scaled by number of GPUs)
   learning_rate: 1e-4
   base_lr_scale: true  # Scale LR by number of GPUs
-  
+
   # Training schedule
   max_epochs: 50
-  warmup_steps: 4000
+  warmup_steps: 1000  # Reduced for faster convergence
   warmup_ratio: 0.1  # Alternative to warmup_steps
-  
+
   # Optimization
   optimizer: "adamw"
-  weight_decay: 1e-6
+  weight_decay: 1e-2  # Increased for better generalization
   beta1: 0.9
   beta2: 0.98
   eps: 1e-9
-  
+
   # Gradient settings
   max_grad_norm: 1.0
   gradient_accumulation_steps: 1
-  
+
   # Learning rate scheduling
   scheduler: "cosine"  # cosine, linear, polynomial, constant
   min_lr: 1e-7
@@ -49,31 +50,34 @@ training:
 
 # Data Loading Configuration
 data:
-  # Dataset paths
-  voxceleb2_root: "data"
-  avspeech_root: ""  # Leave empty if not using AVSpeech
-  
+  # Dataset paths (audio-only)
+  librispeech_root: "data/librispeech"  # Replaced VoxCeleb2/AVSpeech
+  train_split: "train-clean-100"
+  val_split: "dev-clean"
+  test_split: "test-clean"
+
   # Data loading optimization
   num_workers: 4  # Per GPU
   pin_memory: true
   persistent_workers: true
   prefetch_factor: 2
   drop_last: true  # For training stability
-  
-  # Data augmentation
+
+  # Data augmentation (audio-only)
   use_augmentation: true
   augmentation_prob: 0.8
-  
-  # Preprocessing
-  video_size: [224, 224]
-  sequence_length: 150
+
+  # Preprocessing (audio-only)
   audio_sample_rate: 16000
+  n_mels: 80
+  n_fft: 400
+  hop_length: 160
 
 # Model Configuration
 model:
-  # Use base model config
-  config_path: "configs/base_config.yaml"
-  
+  # Use ensemble distillation config (audio-only)
+  config_path: "configs/ensemble_distillation_config.yaml"
+
   # Model optimization
   compile_model: true  # PyTorch 2.0 compilation
   compile_mode: "default"  # default, reduce-overhead, max-autotune
