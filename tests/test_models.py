@@ -1,5 +1,5 @@
 """
-Comprehensive tests for Valerie Visual ASR model components.
+Comprehensive tests for Valerie Audio ASR model components.
 
 Tests all implemented modules to ensure correct functionality,
 tensor shapes, and gradient flow.
@@ -14,11 +14,10 @@ import os
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from src.models.spatio_temporal import (
-    Conv3dBlock, TemporalPositionalEncoding, SpatioTemporalEmbedding
-)
+from src.models.audio_frontend import AudioFrontend, MelSpectrogramExtractor
+from src.models.audio_phoneme_model import AudioPhonemeASR
 from src.models.conformer import (
-    ConvolutionModule, MultiHeadSelfAttention, FeedForward, 
+    ConvolutionModule, MultiHeadSelfAttention, FeedForward,
     ConformerBlock, ConformerEncoder
 )
 from src.models.hybrid_ctc_attention import (
@@ -31,145 +30,164 @@ from src.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
-class TestSpatioTemporalEmbedding:
-    """Test suite for 3D spatio-temporal embedding components."""
-    
+class TestAudioFrontend:
+    """Test suite for audio frontend components."""
+
     def setup_method(self):
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = 2
-        self.seq_len = 16
-        self.height = 112
-        self.width = 112
-        self.channels = 3
-        
+        self.audio_len = 16000  # 1 second at 16kHz
+
         logger.info(f"🧪 Testing on device: {self.device}")
-    
-    def test_conv3d_block(self):
-        """Test Conv3dBlock functionality."""
-        logger.info("🔍 Testing Conv3dBlock...")
-        
-        # Test basic functionality
-        conv_block = Conv3dBlock(
-            in_channels=3, 
-            out_channels=64, 
-            kernel_size=(3, 3, 3)
+
+    def test_mel_spectrogram_extractor(self):
+        """Test MelSpectrogramExtractor functionality."""
+        logger.info("🔍 Testing MelSpectrogramExtractor...")
+
+        mel_extractor = MelSpectrogramExtractor(
+            sample_rate=16000,
+            n_fft=400,
+            hop_length=160,
+            n_mels=80
         ).to(self.device)
-        
-        # Input tensor [B, C, T, H, W]
-        x = torch.randn(self.batch_size, 3, self.seq_len, self.height, self.width).to(self.device)
-        
+
+        # Input audio [B, T]
+        audio = torch.randn(self.batch_size, self.audio_len).to(self.device)
+
         # Forward pass
-        output = conv_block(x)
-        
-        # Check output shape
-        expected_shape = (self.batch_size, 64, self.seq_len, self.height, self.width)
-        assert output.shape == expected_shape, f"Expected {expected_shape}, got {output.shape}"
-        
-        # Check gradient flow
-        loss = output.sum()
-        loss.backward()
-        
-        # Check that gradients exist
-        assert conv_block.conv3d.weight.grad is not None, "No gradients for conv3d weights"
-        
-        logger.info("✅ Conv3dBlock test passed")
-    
-    def test_temporal_positional_encoding(self):
-        """Test TemporalPositionalEncoding functionality."""
-        logger.info("🔍 Testing TemporalPositionalEncoding...")
-        
-        embed_dim = 512
-        max_seq_len = 100
-        
-        # Test sinusoidal encoding
-        pos_enc_sin = TemporalPositionalEncoding(
-            embed_dim=embed_dim,
-            max_sequence_length=max_seq_len,
-            encoding_type="sinusoidal"
+        mel_spec = mel_extractor(audio)
+
+        # Check output shape [B, n_mels, T_mel]
+        assert mel_spec.shape[0] == self.batch_size, "Batch size mismatch"
+        assert mel_spec.shape[1] == 80, "Number of mel bins should be 80"
+
+        # Check that output is in log scale (should have negative values)
+        assert (mel_spec < 0).any(), "Mel spectrogram should be in log scale"
+
+        logger.info("✅ MelSpectrogramExtractor test passed")
+
+    def test_audio_frontend(self):
+        """Test complete AudioFrontend module."""
+        logger.info("🔍 Testing AudioFrontend...")
+
+        embed_dim = 256
+        frontend = AudioFrontend(
+            sample_rate=16000,
+            n_fft=400,
+            hop_length=160,
+            n_mels=80,
+            embed_dim=embed_dim
         ).to(self.device)
-        
-        # Test learnable encoding
-        pos_enc_learn = TemporalPositionalEncoding(
-            embed_dim=embed_dim,
-            max_sequence_length=max_seq_len,
-            encoding_type="learnable"
-        ).to(self.device)
-        
-        # Input tensor [B, T, embed_dim]
-        x = torch.randn(self.batch_size, self.seq_len, embed_dim).to(self.device)
-        
-        # Test both encoding types
-        for pos_enc, name in [(pos_enc_sin, "sinusoidal"), (pos_enc_learn, "learnable")]:
-            output = pos_enc(x)
-            
-            # Check output shape
-            assert output.shape == x.shape, f"Shape mismatch for {name} encoding"
-            
-            # Test with padding mask
-            mask = torch.ones(self.batch_size, self.seq_len).to(self.device)
-            mask[0, self.seq_len//2:] = 0  # Mask second half of first sequence
-            
-            masked_output = pos_enc(x, mask)
-            assert masked_output.shape == x.shape, f"Masked shape mismatch for {name}"
-            
-            # Check that masked positions are zeroed
-            assert torch.allclose(
-                masked_output[0, self.seq_len//2:], 
-                torch.zeros_like(masked_output[0, self.seq_len//2:])
-            ), f"Masking not applied correctly for {name}"
-        
-        logger.info("✅ TemporalPositionalEncoding test passed")
-    
-    def test_spatio_temporal_embedding(self):
-        """Test complete SpatioTemporalEmbedding module."""
-        logger.info("🔍 Testing SpatioTemporalEmbedding...")
-        
-        embed_dim = 512
-        embedding = SpatioTemporalEmbedding(
-            input_channels=3,
-            embed_dim=embed_dim,
-            conv3d_channels=[64, 128, 256, embed_dim],
-            max_sequence_length=100
-        ).to(self.device)
-        
-        # Test with different input formats
-        # Format 1: [B, T, H, W, C]
-        video_input_1 = torch.randn(
-            self.batch_size, self.seq_len, self.height, self.width, 3
-        ).to(self.device)
-        
-        output_1 = embedding(video_input_1)
-        
-        # Check output shape
-        assert output_1.shape[0] == self.batch_size, "Batch size mismatch"
-        assert output_1.shape[2] == embed_dim, "Embedding dimension mismatch"
-        
-        # Format 2: [B, C, T, H, W]
-        video_input_2 = torch.randn(
-            self.batch_size, 3, self.seq_len, self.height, self.width
-        ).to(self.device)
-        
-        output_2 = embedding(video_input_2)
-        
-        # Both formats should produce same output shape
-        assert output_1.shape == output_2.shape, "Different input formats produce different shapes"
-        
-        # Test with padding mask
-        padding_mask = torch.ones(self.batch_size, output_1.shape[1]).to(self.device)
-        padding_mask[1, output_1.shape[1]//2:] = 0
-        
-        masked_output = embedding(video_input_1, padding_mask)
-        assert masked_output.shape == output_1.shape, "Masked output shape mismatch"
-        
+
+        # Input audio [B, T]
+        audio = torch.randn(self.batch_size, self.audio_len).to(self.device)
+        audio_lengths = torch.tensor([self.audio_len, self.audio_len // 2]).to(self.device)
+
+        # Forward pass
+        features, feature_lengths = frontend(audio, audio_lengths)
+
+        # Check output shape [B, T_feat, embed_dim]
+        assert features.shape[0] == self.batch_size, "Batch size mismatch"
+        assert features.shape[2] == embed_dim, "Embedding dimension mismatch"
+
+        # Check that feature lengths are reduced correctly
+        assert feature_lengths[0] > feature_lengths[1], "Feature lengths should reflect audio lengths"
+
         # Test gradient flow
-        loss = output_1.sum()
+        loss = features.sum()
         loss.backward()
-        
-        # Check gradients exist for key components
-        assert embedding.conv_layers[0].conv3d.weight.grad is not None, "No gradients for conv layers"
-        
-        logger.info("✅ SpatioTemporalEmbedding test passed")
+
+        # Check that gradients exist
+        assert frontend.projection.weight.grad is not None, "No gradients for projection"
+
+        logger.info("✅ AudioFrontend test passed")
+
+
+class TestAudioPhonemeASR:
+    """Test suite for complete AudioPhonemeASR model."""
+
+    def setup_method(self):
+        """Set up test fixtures."""
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.batch_size = 2
+        self.audio_len = 16000
+
+    def test_audio_phoneme_asr_initialization(self):
+        """Test AudioPhonemeASR initialization."""
+        logger.info("🔍 Testing AudioPhonemeASR initialization...")
+
+        model = AudioPhonemeASR(
+            embed_dim=256,
+            conformer_layers=4,
+            conformer_heads=4,
+            vocab_size=40,
+            enable_distillation=False
+        ).to(self.device)
+
+        # Check components exist
+        assert hasattr(model, 'audio_frontend'), "Should have audio_frontend"
+        assert hasattr(model, 'conformer'), "Should have conformer"
+        assert hasattr(model, 'ctc_attention'), "Should have ctc_attention"
+
+        logger.info("✅ AudioPhonemeASR initialization test passed")
+
+    def test_audio_phoneme_asr_forward(self):
+        """Test AudioPhonemeASR forward pass."""
+        logger.info("🔍 Testing AudioPhonemeASR forward pass...")
+
+        model = AudioPhonemeASR(
+            embed_dim=256,
+            conformer_layers=4,
+            conformer_heads=4,
+            vocab_size=40,
+            enable_distillation=False
+        ).to(self.device)
+
+        model.eval()
+
+        # Input audio [B, T]
+        audio = torch.randn(self.batch_size, self.audio_len).to(self.device)
+        audio_lengths = torch.tensor([self.audio_len, self.audio_len // 2]).to(self.device)
+
+        # Forward pass
+        with torch.no_grad():
+            outputs = model(audio=audio, audio_lengths=audio_lengths)
+
+        # Check outputs
+        assert 'ctc_logits' in outputs, "Should have CTC logits"
+        assert 'encoder_outputs' in outputs, "Should have encoder outputs"
+
+        ctc_logits = outputs['ctc_logits']
+        assert ctc_logits.shape[0] == self.batch_size, "Batch size mismatch"
+        assert ctc_logits.shape[-1] == 40, "Vocab size should be 40"
+
+        logger.info("✅ AudioPhonemeASR forward pass test passed")
+
+    def test_greedy_decoding(self):
+        """Test greedy decoding."""
+        logger.info("🔍 Testing greedy decoding...")
+
+        model = AudioPhonemeASR(
+            embed_dim=256,
+            conformer_layers=4,
+            conformer_heads=4,
+            vocab_size=40,
+            enable_distillation=False
+        ).to(self.device)
+
+        model.eval()
+
+        # Input audio
+        audio = torch.randn(self.batch_size, self.audio_len).to(self.device)
+
+        # Decode
+        decoded, confidences = model.decode_greedy(audio)
+
+        assert len(decoded) == self.batch_size, "Should have decoded sequences for each batch"
+        assert len(confidences) == self.batch_size, "Should have confidences for each batch"
+
+        logger.info("✅ Greedy decoding test passed")
 
 
 class TestConformerEncoder:
@@ -527,133 +545,162 @@ class TestQwenLLM:
 
 
 class TestIntegration:
-    """Integration tests for the complete pipeline."""
-    
+    """Integration tests for the complete audio pipeline."""
+
     def setup_method(self):
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = 2
-        self.seq_len = 16
-        self.height = 112
-        self.width = 112
-        
+        self.audio_len = 16000  # 1 second at 16kHz
+
         # Create configuration
         self.config = ModelConfig()
-        self.config.embed_dim = 512
-        self.config.conformer_dim = 512
+        self.config.embed_dim = 256
+        self.config.conformer_dim = 256
         self.config.conformer_layers = 4  # Smaller for testing
         self.config.phoneme_vocab_size = 40
-    
-    def test_video_to_phonemes_pipeline(self):
-        """Test the complete video-to-phonemes pipeline."""
-        logger.info("🔍 Testing video-to-phonemes pipeline...")
-        
+
+    def test_audio_to_phonemes_pipeline(self):
+        """Test the complete audio-to-phonemes pipeline."""
+        logger.info("🔍 Testing audio-to-phonemes pipeline...")
+
         # Create components
-        spatio_temporal = SpatioTemporalEmbedding(
-            input_channels=3,
-            embed_dim=self.config.embed_dim,
-            conv3d_channels=[64, 128, 256, self.config.embed_dim]
+        audio_frontend = AudioFrontend(
+            sample_rate=16000,
+            n_fft=400,
+            hop_length=160,
+            n_mels=80,
+            embed_dim=self.config.embed_dim
         ).to(self.device)
-        
+
         conformer = ConformerEncoder(
             input_dim=self.config.embed_dim,
             embed_dim=self.config.conformer_dim,
             num_layers=self.config.conformer_layers,
-            num_heads=8
+            num_heads=4
         ).to(self.device)
-        
+
         hybrid_ctc = HybridCTCAttention(
             encoder_dim=self.config.conformer_dim,
             vocab_size=self.config.phoneme_vocab_size,
             decoder_dim=256
         ).to(self.device)
-        
+
         # Test forward pass through complete pipeline
-        # Input video: [B, T, H, W, C]
-        video_input = torch.randn(
-            self.batch_size, self.seq_len, self.height, self.width, 3
-        ).to(self.device)
-        
-        # 1. Spatio-temporal embedding
-        embedded_features = spatio_temporal(video_input)
-        logger.info(f"   Embedded features shape: {embedded_features.shape}")
-        
+        # Input audio: [B, T]
+        audio_input = torch.randn(self.batch_size, self.audio_len).to(self.device)
+        audio_lengths = torch.tensor([self.audio_len, self.audio_len // 2]).to(self.device)
+
+        # 1. Audio frontend (Mel spectrograms)
+        audio_features, feature_lengths = audio_frontend(audio_input, audio_lengths)
+        logger.info(f"   Audio features shape: {audio_features.shape}")
+
         # 2. Conformer encoding
-        encoded_features = conformer(embedded_features)
+        encoded_features = conformer(audio_features)
         logger.info(f"   Encoded features shape: {encoded_features.shape}")
-        
+
         # 3. CTC/Attention prediction
         hybrid_ctc.eval()
         with torch.no_grad():
             results = hybrid_ctc(encoded_features)
-        
+
         assert 'ctc_logits' in results, "CTC logits missing from pipeline"
         assert 'attention_logits' in results, "Attention logits missing from pipeline"
-        
+
         ctc_shape = results['ctc_logits'].shape
         att_shape = results['attention_logits'].shape
-        
+
         logger.info(f"   CTC logits shape: {ctc_shape}")
         logger.info(f"   Attention logits shape: {att_shape}")
-        
+
         # Verify shapes
         assert ctc_shape[0] == self.batch_size, "CTC batch size mismatch"
         assert ctc_shape[2] == self.config.phoneme_vocab_size, "CTC vocab size mismatch"
-        
+
         assert att_shape[0] == self.batch_size, "Attention batch size mismatch"
         assert att_shape[2] == self.config.phoneme_vocab_size, "Attention vocab size mismatch"
-        
-        logger.info("✅ Video-to-phonemes pipeline test passed")
-    
+
+        logger.info("✅ Audio-to-phonemes pipeline test passed")
+
+    def test_end_to_end_model(self):
+        """Test the complete AudioPhonemeASR model."""
+        logger.info("🔍 Testing end-to-end AudioPhonemeASR model...")
+
+        # Create complete model
+        model = AudioPhonemeASR(
+            embed_dim=self.config.embed_dim,
+            conformer_layers=self.config.conformer_layers,
+            conformer_heads=4,
+            vocab_size=self.config.phoneme_vocab_size,
+            enable_distillation=False
+        ).to(self.device)
+
+        model.eval()
+
+        # Input audio [B, T]
+        audio_input = torch.randn(self.batch_size, self.audio_len).to(self.device)
+
+        # End-to-end inference
+        with torch.no_grad():
+            decoded, confidences = model.decode_greedy(audio_input)
+
+        assert len(decoded) == self.batch_size, "Should have decoded sequences for each batch"
+        assert len(confidences) == self.batch_size, "Should have confidences for each batch"
+
+        logger.info("✅ End-to-end model test passed")
+
     def test_memory_efficiency(self):
-        """Test memory usage and efficiency."""
+        """Test memory usage and efficiency for audio model."""
         logger.info("🔍 Testing memory efficiency...")
-        
+
         if not torch.cuda.is_available():
             logger.info("   Skipping memory test (CUDA not available)")
             return
-        
+
         # Clear GPU memory
         torch.cuda.empty_cache()
         initial_memory = torch.cuda.memory_allocated()
-        
-        # Create and test components
-        spatio_temporal = SpatioTemporalEmbedding(
-            input_channels=3,
-            embed_dim=256,  # Smaller for memory test
-            conv3d_channels=[32, 64, 128, 256]
+
+        # Create audio frontend
+        audio_frontend = AudioFrontend(
+            sample_rate=16000,
+            n_fft=400,
+            hop_length=160,
+            n_mels=80,
+            embed_dim=256
         ).to(self.device)
-        
+
         # Test with larger batch
         large_batch_size = 4
-        video_input = torch.randn(
-            large_batch_size, self.seq_len, 64, 64, 3  # Smaller resolution
-        ).to(self.device)
-        
+        audio_input = torch.randn(large_batch_size, self.audio_len).to(self.device)
+        audio_lengths = torch.tensor([self.audio_len] * large_batch_size).to(self.device)
+
         # Forward pass
-        output = spatio_temporal(video_input)
-        
+        features, _ = audio_frontend(audio_input, audio_lengths)
+
         peak_memory = torch.cuda.memory_allocated()
         memory_used = (peak_memory - initial_memory) / (1024 ** 2)  # MB
-        
+
         logger.info(f"   Memory used: {memory_used:.2f} MB")
-        
+
         # Clean up
-        del spatio_temporal, video_input, output
+        del audio_frontend, audio_input, features
         torch.cuda.empty_cache()
-        
-        assert memory_used < 1000, f"Memory usage too high: {memory_used:.2f} MB"
-        
+
+        # Audio model should use much less memory than video model
+        assert memory_used < 500, f"Memory usage too high for audio model: {memory_used:.2f} MB"
+
         logger.info("✅ Memory efficiency test passed")
 
 
 def run_all_tests():
     """Run all tests with proper logging."""
     logger.info("🚀 Starting comprehensive component tests...")
-    
+
     # Test classes
     test_classes = [
-        TestSpatioTemporalEmbedding,
+        TestAudioFrontend,
+        TestAudioPhonemeASR,
         TestConformerEncoder,
         TestHybridCTCAttention,
         TestQwenLLM,
@@ -706,10 +753,10 @@ def run_all_tests():
 if __name__ == "__main__":
     # Run all tests
     success = run_all_tests()
-    
+
     if success:
-        print("\n✅ All component tests passed! Ready to proceed with implementation.")
+        print("\n✅ All audio ASR component tests passed! Ready to proceed with training.")
     else:
         print("\n❌ Some tests failed. Please review and fix issues before proceeding.")
-    
+
     exit(0 if success else 1)
