@@ -1,6 +1,27 @@
 """
 Complete Inference Engine for Valerie Visual ASR.
 
+⚠️ **DEPRECATED:** This module uses the old video-based ValerieModel.
+
+For audio-only inference with ensemble distillation, use:
+- src.models.audio_phoneme_model.AudioPhonemeASR
+- Direct forward pass with audio inputs
+
+Migration example:
+```python
+from src.models.audio_phoneme_model import AudioPhonemeASR
+
+model = AudioPhonemeASR.from_pretrained("checkpoints/stage1_best.pt")
+audio = load_audio("audio.wav")  # [T] at 16kHz
+outputs = model(audio.unsqueeze(0))
+predictions = model.decode_greedy(audio.unsqueeze(0))
+```
+
+This file is kept for backward compatibility but will be removed in future versions.
+
+---
+
+Original docstring:
 Combines all components for end-to-end inference:
 - Video preprocessing and feature extraction
 - Model forward pass (3D CNN + Conformer + CTC/Attention)

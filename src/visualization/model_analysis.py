@@ -1,11 +1,29 @@
 """
-Model Analysis and Architecture Visualization for Valerie Visual ASR.
+Model Analysis and Architecture Visualization for Valerie ASR.
+
+⚠️ **UPDATED:** This module now supports both old and new models.
 
 Provides tools for:
 - Model architecture diagram generation
 - Parameter analysis and distribution
 - Layer-wise computational analysis
 - Model comparison and profiling
+
+Supported models:
+- AudioPhonemeASR (new, audio-only with ensemble distillation)
+- ValerieModel (legacy, video-based)
+- Any PyTorch nn.Module
+
+Usage with new models:
+```python
+from src.models.audio_phoneme_model import AudioPhonemeASR
+from src.visualization.model_analysis import ModelAnalyzer
+
+model = AudioPhonemeASR(embed_dim=256, conformer_layers=12, vocab_size=40)
+analyzer = ModelAnalyzer(model)
+analyzer.print_summary()
+analyzer.plot_parameter_distribution()
+```
 """
 
 import torch
@@ -20,7 +38,12 @@ from torchsummary import summary
 import logging
 from collections import defaultdict
 
-from src.models import ValerieModel
+# Legacy import - kept for backward compatibility
+try:
+    from src.models import ValerieModel
+except ImportError:
+    ValerieModel = None
+
 from src.utils.config import Config
 from src.utils.logging import get_logger
 
