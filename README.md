@@ -6,7 +6,7 @@ Valerie is a state-of-the-art audio-only automatic speech recognition (ASR) syst
 
 ### Key Features
 
-- **Ensemble Distillation**: Learn from 3 teacher models (Whisper Large V3, Wav2Vec2 Large, HuBERT Large)
+- **Ensemble Distillation**: Learn from 3 teacher models (Whisper Large V3, WavLM Large, HuBERT Large)
 - **Audio-Only**: Efficient Mel spectrogram processing with Conformer encoder
 - **Compact Model**: 50M parameters (10x smaller than Whisper Large)
 - **Three-Stage Training**: Progressive learning from audio to text
@@ -21,7 +21,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 ```
 Stage 1: Audio → Phonemes (Ensemble Distillation)
   Input: Audio (16kHz) → Mel Spectrogram → Conformer → CTC/Attention → Phonemes
-  Teachers: Whisper + Wav2Vec2 + HuBERT
+  Teachers: Whisper + WavLM + HuBERT
   Target: <35% PER
 
 Stage 2: Phonemes → Text (LLM Fine-tuning)
@@ -174,7 +174,7 @@ distillation:
   teachers:
     - model_name: "openai/whisper-large-v3"
       weight: 0.4
-    - model_name: "facebook/wav2vec2-large-960h-lv60-self"
+    - model_name: "microsoft/wavlm-large"
       weight: 0.3
     - model_name: "facebook/hubert-large-ls960-ft"
       weight: 0.3
@@ -226,7 +226,7 @@ This project is licensed under the MIT License - see LICENSE for details.
 
 ## Acknowledgments
 
-- Teacher Models: OpenAI Whisper, Facebook Wav2Vec2, Facebook HuBERT
+- Teacher Models: OpenAI Whisper, Microsoft WavLM, Facebook HuBERT
 - LLM: Qwen team for Qwen 0.6B model
 - Datasets: LibriSpeech, WikiText, BookCorpus
 - Frameworks: PyTorch, Transformers

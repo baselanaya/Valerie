@@ -6,7 +6,7 @@ to a smaller student model for efficient phoneme recognition with improved accur
 
 Supports multiple teacher models including:
 - Whisper Large V3 (OpenAI)
-- Wav2Vec2 Large (Facebook)
+- WavLM Large (Microsoft)
 - HuBERT Large (Facebook)
 - Any other ASR model from Hugging Face
 """
@@ -16,7 +16,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import (
     WhisperModel, WhisperProcessor,
-    Wav2Vec2Model, Wav2Vec2Processor,
+    WavLMModel, Wav2Vec2Processor,
     HubertModel, HubertProcessor,
     AutoModel, AutoProcessor
 )
@@ -48,7 +48,7 @@ class TeacherModel(nn.Module):
 
         Args:
             model_name: Model identifier from Hugging Face
-            model_type: Type of model ("whisper", "wav2vec2", "hubert", "auto")
+            model_type: Type of model ("whisper", "wavlm", "hubert", "auto")
             feature_layer: Which encoder layer to extract features from (-1 for last)
             freeze: Whether to freeze teacher parameters
             extract_phoneme_logits: Whether to extract phoneme predictions
@@ -70,8 +70,8 @@ class TeacherModel(nn.Module):
             self.sample_rate = self.processor.feature_extractor.sampling_rate
             self.feature_dim = self.model.config.d_model
 
-        elif self.model_type == "wav2vec2":
-            self.model = Wav2Vec2Model.from_pretrained(model_name)
+        elif self.model_type == "wavlm":
+            self.model = WavLMModel.from_pretrained(model_name)
             self.processor = Wav2Vec2Processor.from_pretrained(model_name)
             self.sample_rate = self.processor.feature_extractor.sampling_rate
             self.feature_dim = self.model.config.hidden_size
@@ -151,7 +151,7 @@ class TeacherModel(nn.Module):
                 )
                 processed_audios.append(inputs.input_features)
             else:
-                # Wav2Vec2, HuBERT, etc.
+                # WavLM, HuBERT, etc.
                 inputs = self.processor(
                     audio,
                     sampling_rate=sample_rate,
@@ -197,7 +197,7 @@ class TeacherModel(nn.Module):
                     return_dict=True
                 )
             else:
-                # Wav2Vec2, HuBERT, etc.
+                # WavLM, HuBERT, etc.
                 outputs = self.model(
                     **inputs,
                     output_hidden_states=return_all_layers or (self.feature_layer != -1),
@@ -252,7 +252,7 @@ class EnsembleDistillationModule(nn.Module):
         Args:
             teacher_configs: List of teacher configurations, each with:
                 - model_name: Hugging Face model identifier
-                - model_type: Model type ("whisper", "wav2vec2", "hubert")
+                - model_type: Model type ("whisper", "wavlm", "hubert")
                 - weight: Optional weight for this teacher (default: 1.0)
             student_feature_dim: Student model feature dimension
             projection_dim: Common projection space dimension
@@ -609,8 +609,8 @@ def create_ensemble_distillation(
                     'weight': 0.4
                 },
                 {
-                    'model_name': 'facebook/wav2vec2-large-960h-lv60-self',
-                    'model_type': 'wav2vec2',
+                    'model_name': 'microsoft/wavlm-large',
+                    'model_type': 'wavlm',
                     'weight': 0.3
                 },
                 {
@@ -653,8 +653,8 @@ if __name__ == "__main__":
                 'weight': 0.5
             },
             {
-                'model_name': 'facebook/wav2vec2-base-960h',
-                'model_type': 'wav2vec2',
+                'model_name': 'microsoft/wavlm-base',
+                'model_type': 'wavlm',
                 'weight': 0.5
             }
         ],

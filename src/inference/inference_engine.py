@@ -8,9 +8,11 @@ using AudioPhonemeASR with 3-teacher ensemble distillation.
 import torch
 import torchaudio
 import numpy as np
+import json
 from pathlib import Path
 from typing import Union, List, Dict, Optional, Tuple
 from dataclasses import dataclass
+from safetensors.torch import load_file
 
 from src.models.audio_phoneme_model import AudioPhonemeASR
 from src.models.qwen_llm import QwenPhonemeToText
@@ -25,7 +27,8 @@ class InferenceConfig:
     """Configuration for audio-only inference."""
 
     # Model paths
-    stage1_checkpoint: str  # Audio → Phonemes model
+    stage1_checkpoint: str  # Audio → Phonemes model (.safetensors or .pt)
+    stage1_config: Optional[str] = None  # Config file (optional, will auto-detect)
     stage2_checkpoint: Optional[str] = None  # Phonemes → Text (Qwen LLM)
 
     # Device
@@ -110,14 +113,23 @@ class AudioInferenceEngine:
         logger.info("📥 Loading Stage 1 model...")
 
         try:
-            # Load checkpoint
-            checkpoint = torch.load(
-                self.config.stage1_checkpoint,
-                map_location=self.device
-            )
+            checkpoint_path = Path(self.config.stage1_checkpoint)
 
-            # Get model config
-            model_config = checkpoint.get('config', {})
+            # Load configuration
+            if self.config.stage1_config:
+                config_path = Path(self.config.stage1_config)
+            else:
+                # Auto-detect config file in same directory
+                config_path = checkpoint_path.parent / "config.json"
+
+            if config_path.exists():
+                with open(config_path, 'r') as f:
+                    model_config = json.load(f)
+                logger.info(f"📄 Loaded config from {config_path}")
+            else:
+                logger.warning(f"⚠️ Config file not found: {config_path}")
+                logger.info("   Using default configuration")
+                model_config = {}
 
             # Create model
             model = AudioPhonemeASR(
@@ -128,8 +140,26 @@ class AudioInferenceEngine:
                 enable_distillation=False  # Disable for inference
             )
 
-            # Load weights
-            model.load_state_dict(checkpoint['model_state_dict'])
+            # Load weights based on file format
+            if checkpoint_path.suffix == '.safetensors':
+                # Load from safetensors format (recommended)
+                state_dict = load_file(str(checkpoint_path))
+                model.load_state_dict(state_dict, strict=True)
+                logger.info("✅ Loaded model from safetensors format")
+            elif checkpoint_path.suffix == '.pt':
+                # Load from PyTorch format
+                checkpoint = torch.load(
+                    str(checkpoint_path),
+                    map_location=self.device
+                )
+                if 'model_state_dict' in checkpoint:
+                    model.load_state_dict(checkpoint['model_state_dict'])
+                else:
+                    model.load_state_dict(checkpoint)
+                logger.info("✅ Loaded model from PyTorch format")
+            else:
+                raise ValueError(f"Unsupported model format: {checkpoint_path.suffix}")
+
             model.to(self.device)
             model.eval()
 

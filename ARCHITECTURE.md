@@ -97,7 +97,7 @@ Audio Waveform [T]
 │  └────────┬─────────┘                      │
 │           │                                 │
 │  ┌────────▼─────────┐                      │
-│  │ Wav2Vec2 Large   │ (weight: 0.3)        │
+│  │  WavLM Large     │ (weight: 0.3)        │
 │  │   317M params    │                      │
 │  └────────┬─────────┘                      │
 │           │                                 │
@@ -443,9 +443,9 @@ src/inference/
    - Model: openai/whisper-large-v3
    - Parameters: 1.5B
 
-2. **Wav2Vec2 Large**
-   - Baevski et al., "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations"
-   - Model: facebook/wav2vec2-large-960h-lv60-self
+2. **WavLM Large**
+   - Chen et al., "WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing"
+   - Model: microsoft/wavlm-large
    - Parameters: 317M
 
 3. **HuBERT Large**
