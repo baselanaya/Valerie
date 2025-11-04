@@ -1,64 +1,106 @@
-# Valerie: Enhanced Visual ASR Language Model
+# Valerie: Audio ASR with Ensemble Knowledge Distillation
 
 ## Overview
 
-Valerie is a state-of-the-art visual automatic speech recognition (ASR) language model designed to improve upon existing lip reading technologies. The model implements a two-stage approach: **Video → Phonemes → Sentences**, incorporating four key architectural innovations that address fundamental limitations in current visual ASR systems.
+Valerie is a state-of-the-art **audio-only** automatic speech recognition (ASR) system using ensemble knowledge distillation from multiple teacher models. The system implements a three-stage training approach: **Audio → Phonemes → Text**, achieving high accuracy with a compact student model.
 
-## Key Innovations
+### Key Features
 
-### 1. 3D Spatio-Temporal Embedding
-- **Problem**: Traditional 2D frame-by-frame processing misses temporal lip movement dynamics
-- **Solution**: 3D CNN blocks capture coarticulation effects and lip movement transitions
-- **Impact**: Better phoneme boundary detection and temporal sequence modeling
-
-### 2. Conformer Architecture
-- **Problem**: Vision Transformers lack local feature modeling capabilities
-- **Solution**: Hybrid CNN-Transformer blocks combining local and global context
-- **Impact**: Improved phoneme prediction accuracy through better feature representation
-
-### 3. Hybrid CTC/Attention Training
-- **Problem**: CTC-only training struggles with sequence modeling and alignment
-- **Solution**: Joint CTC and attention-based training with shared encoder
-- **Impact**: Better temporal alignment and sequence generation capabilities
-
-### 4. Audio Knowledge Distillation
-- **Problem**: Visual-only models lack the rich information available in audio signals
-- **Solution**: Distill knowledge from pre-trained audio ASR models into visual encoder
-- **Impact**: Improved accuracy while maintaining visual-only inference capability
+- 🎯 **Ensemble Distillation**: Learn from 3 teacher models (Whisper Large V3, Wav2Vec2 Large, HuBERT Large)
+- 🎵 **Audio-Only**: Efficient Mel spectrogram processing with Conformer encoder
+- 📉 **Compact Model**: 50M parameters (10x smaller than Whisper Large)
+- 🎓 **Three-Stage Training**: Progressive learning from audio to text
+- 🚀 **High Performance**: Target <8-12% WER with LibriSpeech training
 
 ## Architecture Overview
 
 ```
-Input Video Frames (224x224x3)
-         ↓
-3D Spatio-Temporal Embedding
-    (3D CNN + Temporal Embeddings)
-         ↓
-Conformer Encoder
-    (CNN + Transformer Blocks)
-         ↓
-Hybrid CTC/Attention Head
-    (Joint Training)
-         ↓
-Phoneme Sequences
-         ↓
-Fine-tuned LLM (LoRA)
-         ↓
-Final Sentences
+┌─────────────────────────────────────────────────────────────┐
+│                    THREE-STAGE ARCHITECTURE                 │
+└─────────────────────────────────────────────────────────────┘
+
+STAGE 1: Audio → Phonemes (Ensemble Distillation)
+────────────────────────────────────────────────────
+
+Input Audio (16kHz)
+     ↓
+Mel Spectrogram (80 bins)
+     ↓
+AudioFrontend (Conv1D + Positional Encoding)
+     ↓
+Conformer Encoder (256 dim, 12 layers)
+     ↓
+CTC/Attention Hybrid Head
+     ↓
+Phoneme Sequence (39 ARPAbet phonemes)
+
+Teacher Models (Ensemble):
+  • Whisper Large V3 (weight: 0.4)
+  • Wav2Vec2 Large (weight: 0.3)
+  • HuBERT Large (weight: 0.3)
+
+Training: 30-100h LibriSpeech + Distillation
+Target: <35% PER
+
+
+STAGE 2: Phonemes → Text (LLM Fine-tuning)
+────────────────────────────────────────────
+
+Phoneme Sequence + Synthetic Errors
+     ↓
+Qwen 0.6B LLM (LoRA fine-tuned)
+     ↓
+Text Reconstruction
+
+Training: Unlimited text data (WikiText + BookCorpus)
+Target: >95% Reconstruction Accuracy
+
+
+STAGE 3: End-to-End Fine-tuning (Optional)
+────────────────────────────────────────────
+
+Audio → Phonemes → Text (Joint training)
+
+Training: 10h high-quality paired data
+Target: <8-12% WER (Final)
 ```
+
+## Key Innovations
+
+### 1. Multi-Teacher Ensemble Distillation
+- **Problem**: Single teacher provides limited supervision
+- **Solution**: Aggregate knowledge from 3 diverse audio ASR models
+- **Impact**: Richer feature learning and better generalization
+
+### 2. Two-Stage Architecture
+- **Problem**: End-to-end models require large paired audio-text datasets
+- **Solution**: Separate phoneme prediction (audio data) from text reconstruction (unlimited text data)
+- **Impact**: Better data efficiency and performance
+
+### 3. Conformer Encoder (Compact)
+- **Problem**: Large Transformer models are computationally expensive
+- **Solution**: Hybrid CNN-Transformer with reduced dimensions (256 dim, 12 layers)
+- **Impact**: 10x parameter reduction while maintaining accuracy through distillation
+
+### 4. Synthetic Error Injection
+- **Problem**: LLM needs to handle imperfect phoneme predictions
+- **Solution**: Add controlled errors (substitution, deletion, insertion) during LLM training
+- **Impact**: Robust text reconstruction even with phoneme errors
 
 ## Installation
 
 ### Requirements
 - Python 3.8+
 - PyTorch 2.0+
+- torchaudio
+- transformers (for Qwen LLM)
 - CUDA 11.8+ (for GPU training)
 
 ### Setup
 ```bash
 # Clone repository
-git clone https://github.com/valerie-team/valerie-visual-asr.git
-cd valerie-visual-asr
+git clone https://github.com/valerie-team/valerie-asr.git
+cd valerie-asr
 
 # Install dependencies
 pip install -r requirements.txt
@@ -70,440 +112,288 @@ pip install -e .
 ## Quick Start
 
 ### 1. Data Preparation
-```bash
-# Prepare VoxCeleb2 dataset
-python scripts/prepare_data.py --dataset voxceleb2 --config configs/voxceleb2_config.yaml
 
-# Prepare AVSpeech dataset
-python scripts/prepare_data.py --dataset avspeech --config configs/avspeech_config.yaml
+```bash
+# Download LibriSpeech (for Stage 1)
+wget https://www.openslr.org/resources/12/train-clean-100.tar.gz
+tar -xzf train-clean-100.tar.gz
+
+# Prepare text data (for Stage 2)
+python scripts/prepare_text_data.py --output data/text_corpus
 ```
 
 ### 2. Training
-```bash
-# Train on VoxCeleb2
-python scripts/train.py --config configs/voxceleb2_config.yaml --experiment-name voxceleb2_exp
 
-# Train on AVSpeech
-python scripts/train.py --config configs/avspeech_config.yaml --experiment-name avspeech_exp
-```
-
-### 3. Evaluation
-```bash
-# Evaluate trained model
-python scripts/evaluate.py --config configs/base_config.yaml --checkpoint path/to/checkpoint.ckpt
-```
-
-### 4. Inference
-```bash
-# Run inference on video file
-python scripts/inference.py --checkpoint path/to/checkpoint.ckpt --input video.mp4
-
-# Real-time inference
-python scripts/inference.py --checkpoint path/to/checkpoint.ckpt --input camera --real-time
-```
-
-## Multi-GPU Training
-
-Valerie supports three different multi-GPU training methods optimized for different use cases:
-
-### 1. PyTorch Native DDP (Recommended for Single Machine)
-**Best performance for 2-8 GPUs on single machine**
+#### Stage 1: Audio → Phonemes (with Ensemble Distillation)
 
 ```bash
-# Use all available GPUs
-python train_multi_gpu.py --gpus all --batch-size 8
-
-# Use specific GPUs
-python train_multi_gpu.py --gpus 0,1,2,3 --batch-size 8 --epochs 50
-
-# With mixed precision
-python train_multi_gpu.py --gpus 0,1 --batch-size 8 --mixed-precision fp16
+python scripts/train_stage1_phoneme_asr.py \
+  --config configs/ensemble_distillation_config.yaml \
+  --data-root data/LibriSpeech/train-clean-100 \
+  --output-dir checkpoints/stage1 \
+  --use-distillation
 ```
 
-**Advantages:**
-- ✅ **Fastest**: Direct NCCL communication, minimal overhead
-- ✅ **Most Stable**: Battle-tested by PyTorch community  
-- ✅ **No Dependencies**: Built into PyTorch
-- ✅ **95%+ Scaling Efficiency**
+**Key Parameters:**
+- Warmup: 5 epochs (CTC only)
+- Distillation: 45 epochs (CTC + 3-teacher ensemble)
+- Target: <35% PER
 
-### 2. Accelerate (Easiest to Use)
-**Best for research and rapid prototyping**
+#### Stage 2: Phonemes → Text (LLM Fine-tuning)
 
 ```bash
-# Install Accelerate
-pip install accelerate
-
-# Use Accelerate for training
-python train_multi_gpu.py --accelerate --batch-size 8 --mixed-precision fp16
-
-# With advanced features
-python train_multi_gpu.py --accelerate --batch-size 4 --epochs 100
+python scripts/train_stage2_phoneme_to_text.py \
+  --config configs/ensemble_distillation_config.yaml \
+  --stage1-checkpoint checkpoints/stage1/best_model.pt \
+  --text-data data/text_corpus \
+  --output-dir checkpoints/stage2
 ```
 
-**Advantages:**
-- ✅ **User-Friendly**: Minimal code changes required
-- ✅ **Feature-Rich**: Built-in mixed precision, logging, etc.
-- ✅ **Great Documentation**: Excellent examples and guides
-- ✅ **Active Development**: Regular updates and improvements
+**Key Parameters:**
+- Base model: Qwen 0.6B
+- LoRA rank: 32, alpha: 64
+- Synthetic error rate: 10-15%
+- Target: >95% reconstruction
 
-### 3. Alternative: PyTorch Lightning (Optional)
-**For those who prefer high-level abstractions**
+#### Stage 3: End-to-End Fine-tuning (Optional)
 
 ```bash
-# Install PyTorch Lightning
-pip install pytorch-lightning
-
-# Lightning provides similar functionality to Accelerate
-# with additional features for research workflows
+python scripts/train_stage3_end_to_end.py \
+  --config configs/ensemble_distillation_config.yaml \
+  --stage1-checkpoint checkpoints/stage1/best_model.pt \
+  --stage2-checkpoint checkpoints/stage2/best_model.pt \
+  --data-root data/LibriSpeech/train-clean-10 \
+  --output-dir checkpoints/stage3
 ```
 
-**When to Consider:**
-- 🔬 **Research-Focused**: Built for ML research workflows
-- 📊 **Experiment Tracking**: Built-in logging and monitoring
-- 🎛️ **High-Level API**: Abstracts away training loops
-- ⚠️ **Learning Curve**: Requires understanding Lightning patterns
+**Key Parameters:**
+- Joint training of both stages
+- Small high-quality dataset (10h)
+- Target: <8-12% WER
 
-### Performance Comparison
+### 3. Inference
 
-| Method | Setup | Performance | Scaling | Memory | Best For |
-|--------|-------|-------------|---------|---------|----------|
-| **PyTorch DDP** | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Single machine |
-| **Accelerate** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Research/prototyping |
-| **Lightning** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Research workflows |
+```python
+from src.inference.inference_engine import AudioInferenceEngine, InferenceConfig
 
-### Configuration Examples
+# Initialize engine
+config = InferenceConfig(
+    stage1_checkpoint="checkpoints/stage1/best_model.pt",
+    stage2_checkpoint="checkpoints/stage2/best_model.pt",
+    use_llm_reconstruction=True
+)
+engine = AudioInferenceEngine(config)
 
-```yaml
-# configs/multi_gpu_config.yaml
-training_method: "ddp"  # ddp, accelerate
-
-gpu:
-  gpu_ids: [0, 1, 2, 3]  # Specific GPUs or null for all
-  mixed_precision: "fp16"
-
-training:
-  batch_size: 8  # Per GPU
-  learning_rate: 1e-4
-  max_epochs: 50
-
-ddp:
-  backend: "nccl"
-  find_unused_parameters: false
-  bucket_cap_mb: 25
+# Transcribe audio file
+result = engine.transcribe("audio.wav")
+print(f"Text: {result.text}")
+print(f"Confidence: {result.confidence:.2%}")
 ```
+
+### 4. Evaluation
+
+```bash
+# Evaluate Stage 1 (Phoneme Error Rate)
+python scripts/evaluate.py \
+  --stage stage1 \
+  --checkpoint checkpoints/stage1/best_model.pt \
+  --test-data data/LibriSpeech/test-clean
+
+# Evaluate End-to-End (Word Error Rate)
+python scripts/evaluate.py \
+  --stage stage3 \
+  --checkpoint checkpoints/stage3/best_model.pt \
+  --test-data data/LibriSpeech/test-clean
+```
+
+## Model Architecture Details
+
+### AudioFrontend
+- **Input**: Raw audio waveform at 16kHz
+- **Output**: Mel spectrogram features (80 bins)
+- **Components**:
+  - MelSpectrogram extraction (n_fft=400, hop_length=160)
+  - SpecAugment (frequency + time masking)
+  - Conv1D projection to embedding dimension
+  - Positional encoding
+
+### Conformer Encoder
+- **Dimensions**: 256
+- **Layers**: 12
+- **Heads**: 4
+- **Components** (per layer):
+  - Feed-forward module (expansion factor: 4)
+  - Multi-head self-attention
+  - Convolution module (kernel size: 31)
+  - Feed-forward module
+  - Layer normalization
+
+### CTC/Attention Hybrid
+- **CTC Head**: Linear projection to phoneme vocabulary (40 tokens)
+- **Attention Decoder**: LSTM-based decoder with location-aware attention
+- **Training**: Joint CTC + Attention loss (λ_CTC = 0.3, λ_Att = 0.7)
+
+### Ensemble Distillation Module
+- **Teachers**: Whisper Large V3, Wav2Vec2 Large, HuBERT Large
+- **Distillation Losses**:
+  - Feature-level MSE (encoder outputs)
+  - Soft label KL divergence (temperature=4.0)
+- **Aggregation**: Weighted average (0.4, 0.3, 0.3)
+
+## Performance Targets
+
+| Metric | Stage 1 | Stage 2 | Stage 3 (Final) |
+|--------|---------|---------|-----------------|
+| **PER** | <35% | - | <20% |
+| **WER** | - | - | <8-12% |
+| **Reconstruction** | - | >95% | >97% |
+| **Model Size** | 50M params | 600M params | 650M params |
+| **Inference Speed** | ~20ms/sec | ~50ms/sec | ~70ms/sec |
 
 ## Configuration
 
-The system uses YAML configuration files for easy customization:
+Main configuration file: `configs/ensemble_distillation_config.yaml`
 
-- `configs/base_config.yaml`: Base configuration with default parameters
-- `configs/voxceleb2_config.yaml`: VoxCeleb2-specific settings
-- `configs/avspeech_config.yaml`: AVSpeech-specific settings
+Key sections:
+```yaml
+model:
+  embed_dim: 256
+  conformer_layers: 12
+  conformer_heads: 4
+  vocab_size: 40
 
-Key configuration sections:
-- **model**: Architecture parameters (Conformer layers, embedding dimensions, etc.)
-- **training**: Training hyperparameters (learning rate, batch size, loss weights)
-- **data**: Dataset paths and preprocessing parameters
-- **distillation**: Knowledge distillation settings
+distillation:
+  enable: true
+  teachers:
+    - model_name: "openai/whisper-large-v3"
+      weight: 0.4
+    - model_name: "facebook/wav2vec2-large-960h-lv60-self"
+      weight: 0.3
+    - model_name: "facebook/hubert-large-ls960-ft"
+      weight: 0.3
+  temperature: 4.0
 
-## Datasets
+training:
+  batch_size: 32
+  learning_rate: 1e-4
+  warmup_epochs: 5
+  distillation_epochs: 45
+```
 
-### VoxCeleb2
-- **Scale**: 1M+ utterances from 6,112 celebrities
-- **Diversity**: Wide range of speakers, accents, and recording conditions
-- **Usage**: Primary training dataset for speaker diversity
+## Project Structure
 
-### AVSpeech
-- **Scale**: 270k training segments, 22k test segments
-- **Quality**: Clean audio-visual segments with face coordinates
-- **Usage**: High-quality segments for model validation
+```
+Valerie/
+├── src/
+│   ├── models/
+│   │   ├── audio_frontend.py          # Mel spectrogram extraction
+│   │   ├── audio_phoneme_model.py     # Complete Stage 1 model
+│   │   ├── ensemble_distillation.py   # 3-teacher distillation
+│   │   ├── conformer.py                # Conformer encoder
+│   │   ├── hybrid_ctc_attention.py     # CTC/Attention head
+│   │   └── qwen_llm.py                 # Stage 2 LLM
+│   ├── data/
+│   │   ├── transforms.py               # Audio augmentation
+│   │   ├── collate.py                  # Batch collation
+│   │   └── text_to_phoneme.py          # G2P conversion
+│   ├── training/
+│   │   └── trainer.py                  # Training loops
+│   └── inference/
+│       └── inference_engine.py         # Audio inference
+├── scripts/
+│   ├── train_stage1_phoneme_asr.py    # Stage 1 training
+│   ├── train_stage2_phoneme_to_text.py # Stage 2 training
+│   └── train_stage3_end_to_end.py     # Stage 3 training
+├── configs/
+│   └── ensemble_distillation_config.yaml
+├── tests/
+│   ├── test_models.py                  # Model tests
+│   └── test_integration.py             # Integration tests
+└── README.md
+```
 
-## Model Architecture
+## Documentation
 
-### Technical Specifications
-- **Encoder**: 12-layer Conformer with 8 attention heads
-- **3D CNN**: 4-layer network with residual connections
-- **Vocabulary**: 40 phonemes (39 English phonemes + blank token)
-- **Parameters**: ~500M total parameters
-- **Training**: Mixed precision (FP16) with gradient checkpointing
-
-### Performance Targets
-- **Primary Goal**: Achieve better than 18.7% WER on standard benchmarks
-- **Efficiency**: Maintain data efficiency with <1% additional labeled data
-- **Speed**: Real-time inference capability on modern GPUs
-- **Robustness**: Handle diverse speakers, lighting conditions, and poses
+- **Architecture Details**: See [README_ENSEMBLE_DISTILLATION.md](README_ENSEMBLE_DISTILLATION.md)
+- **Training Guide**: See training scripts in `scripts/`
+- **API Reference**: See docstrings in source files
 
 ## Hardware Requirements
 
-### Architecture Overview for Memory Planning
+### Training (Stage 1 with Distillation)
+- **GPU**: NVIDIA A100 (40GB) or equivalent
+- **RAM**: 32GB+
+- **Storage**: 100GB+ for LibriSpeech + teacher models
+- **Training Time**: ~24-48 hours for 50 epochs
 
-**Complete Model Stack:**
-- **3D Spatio-Temporal CNN**: ~50M parameters, 3D convolutions on video frames
-- **Conformer Encoder (12 layers)**: ~300M parameters, attention + convolution blocks
-- **Hybrid CTC/Attention Head**: ~20M parameters, dual prediction heads
-- **Whisper Large V3 Teacher**: ~1550M parameters (frozen during distillation)
-- **Qwen3-0.6B LLM**: ~600M parameters + LoRA adapters (~2M)
-- **Cross-Modal Alignment**: ~10M parameters for visual-audio projection
-- **Total Trainable**: ~980M parameters (~3.9GB FP32, ~2GB FP16)
+### Training (Stage 2)
+- **GPU**: NVIDIA A100 (40GB) recommended
+- **RAM**: 32GB+
+- **Storage**: 50GB+ for text corpus
+- **Training Time**: ~12-24 hours
 
-### Distributed Training Architecture
+### Inference
+- **GPU**: Any CUDA-capable GPU (4GB+ VRAM)
+- **CPU**: Possible but slower (10x)
+- **Latency**: ~20-70ms per second of audio (on GPU)
 
-**Ray + Accelerate Integration:**
-- **Data Sharding**: Distribute VoxCeleb2 (119GB) + AVSpeech (~500GB) across nodes
-- **Model Sharding**: Split large components (Conformer, Whisper) across GPUs
-- **Pipeline Parallelism**: Stage-wise execution (3D CNN → Conformer → CTC/Attention)
-- **Mixed Precision**: FP16 training with gradient scaling
-- **Gradient Accumulation**: Simulate large batch sizes with limited memory
+## Migration from Video-Based System
 
-### Single Node Setups
+If you're upgrading from the old video-based Valerie:
 
-#### Development/Prototyping (Single GPU)
-- **GPU**: 1x NVIDIA RTX 4090 (24GB VRAM) or A6000 (48GB)
-- **CPU**: 16+ cores (Intel i9-13900K or AMD Ryzen 9 7950X)
-- **RAM**: 64GB DDR4/DDR5
-- **Storage**: 2TB NVMe SSD (Gen4 recommended)
-- **Network**: 1Gbps minimum for dataset streaming
-- **Training Time**: ~3-4 weeks (with gradient checkpointing)
-- **Limitations**: Batch size ≤4, model sharding required
+1. **Old imports** (deprecated):
+   ```python
+   from src.models import ValerieModel  # ❌ Deprecated
+   from src.data import VideoTransforms  # ❌ Removed
+   ```
 
-#### Research/Small Team (Dual GPU)
-- **GPU**: 2x NVIDIA RTX 4090 (24GB each) or 2x A100 (40GB each)
-- **CPU**: 24+ cores (Intel Xeon W or AMD Threadripper)
-- **RAM**: 128GB DDR4/DDR5
-- **Storage**: 4TB NVMe SSD RAID0 + 8TB HDD backup
-- **Network**: 10Gbps for efficient data loading
-- **Training Time**: ~1.5-2 weeks
-- **Features**: Data parallelism, larger batch sizes (8-16)
+2. **New imports** (audio-only):
+   ```python
+   from src.models.audio_phoneme_model import AudioPhonemeASR  # ✅
+   from src.data.transforms import AudioTransforms  # ✅
+   from src.inference.inference_engine import AudioInferenceEngine  # ✅
+   ```
 
-#### Production/Large Team (Multi-GPU)
-- **GPU**: 4x NVIDIA A100 (80GB each) or 8x A100 (40GB each)
-- **CPU**: 64+ cores (Intel Xeon Platinum or AMD EPYC)
-- **RAM**: 256GB+ DDR4 ECC
-- **Storage**: 8TB NVMe SSD RAID0 + 16TB enterprise HDD
-- **Network**: 25Gbps+ with InfiniBand for multi-node
-- **Training Time**: ~4-7 days
-- **Features**: Full pipeline parallelism, model sharding, large batch sizes (32-64)
-
-### Multi-Node Distributed Training
-
-#### Ray Cluster Configuration
-```yaml
-# 4-Node A100 Cluster Example
-head_node:
-  gpu: 8x A100 80GB
-  cpu: 128 cores (2x AMD EPYC 7742)
-  ram: 1TB DDR4 ECC
-  storage: 16TB NVMe SSD
-  network: 100Gbps InfiniBand
-
-worker_nodes: 3x
-  gpu: 8x A100 80GB each
-  cpu: 128 cores each
-  ram: 1TB each
-  storage: 8TB NVMe SSD each
-  network: 100Gbps InfiniBand
-
-total_resources:
-  gpus: 32x A100 80GB (2.56TB total VRAM)
-  cores: 512 CPU cores
-  ram: 4TB total RAM
-  training_time: ~1-2 days
-```
-
-### Memory Requirements Breakdown
-
-#### Training Memory per GPU (FP16)
-- **Model Parameters**: ~2GB (with model sharding: ~500MB per GPU)
-- **Optimizer States**: ~4GB (Adam: 2x model size)
-- **Gradients**: ~2GB (same as model parameters)
-- **Activations**: ~8-16GB (depends on batch size and sequence length)
-- **3D CNN Activations**: ~4-8GB (video frames + temporal features)
-- **Whisper Cache**: ~2-4GB (frozen teacher model features)
-- **Data Buffers**: ~2-4GB (batch loading and augmentation)
-- **Total per GPU**: ~24-40GB (requires 40GB+ VRAM for safety)
-
-#### Data Storage Requirements
-- **VoxCeleb2 Processed**: ~300GB (video frames + audio + transcripts)
-- **AVSpeech Processed**: ~500GB (video segments + face coordinates)
-- **Phoneme Alignments**: ~50GB (MFA outputs and CTC labels)
-- **Model Checkpoints**: ~100GB (multiple training stages)
-- **Logs and Metrics**: ~20GB (tensorboard, wandb, training logs)
-- **Working Space**: ~200GB (temporary files, data preprocessing)
-- **Total Storage**: ~1.2TB minimum, 2TB recommended
-
-### Cloud Computing Options
-
-#### AWS (Optimized for Ray)
-- **p4d.24xlarge**: 8x A100 40GB, 96 vCPUs, 1.1TB RAM (~$32/hour)
-- **p4de.24xlarge**: 8x A100 80GB, 96 vCPUs, 1.1TB RAM (~$40/hour)
-- **Multi-node setup**: 4x p4de.24xlarge (~$160/hour, ~$3,840/day)
-- **Storage**: Amazon FSx for Lustre (high-performance parallel filesystem)
-- **Network**: 400Gbps network performance, EFA for MPI
-
-#### Google Cloud Platform
-- **a2-ultragpu-8g**: 8x A100 40GB, 96 vCPUs, 1.4TB RAM (~$30/hour)
-- **a2-megagpu-16g**: 16x A100 40GB, 96 vCPUs, 1.4TB RAM (~$55/hour)
-- **Multi-node setup**: 2x a2-megagpu-16g (~$110/hour, ~$2,640/day)
-- **Storage**: Google Cloud Filestore or Persistent Disk SSD
-- **Network**: Up to 100Gbps with GPUDirect-RDMA
-
-#### Microsoft Azure
-- **ND96amsr_A100_v4**: 8x A100 80GB, 96 vCPUs, 1.9TB RAM (~$35/hour)
-- **ND96isr_H100_v5**: 8x H100 80GB, 96 vCPUs, 1.9TB RAM (~$45/hour)
-- **Multi-node setup**: 4x ND96amsr_A100_v4 (~$140/hour, ~$3,360/day)
-- **Storage**: Azure NetApp Files or Premium SSD
-- **Network**: 200Gbps InfiniBand with SR-IOV
-
-### Performance Optimization Strategies
-
-#### Ray Configuration
-```python
-# Ray cluster optimization
-ray.init(
-    address="ray://head-node:10001",
-    runtime_env={
-        "pip": ["accelerate", "transformers", "datasets"],
-        "env_vars": {"CUDA_VISIBLE_DEVICES": "0,1,2,3,4,5,6,7"}
-    }
-)
-
-# Data sharding across nodes
-@ray.remote(num_gpus=1)
-class DataWorker:
-    def load_shard(self, shard_id): 
-        # Load VoxCeleb2/AVSpeech shard
-        pass
-```
-
-#### Accelerate Integration
-```python
-# Multi-GPU training with model sharding
-accelerator = Accelerator(
-    mixed_precision="fp16",
-    gradient_accumulation_steps=4,
-    dataloader_config=DataLoaderConfiguration(
-        split_batches=True,
-        dispatch_batches=True
-    )
-)
-
-# Model sharding for large components
-device_map = {
-    "spatio_temporal": 0,
-    "conformer.layers.0-5": 1,
-    "conformer.layers.6-11": 2,
-    "ctc_attention": 3,
-    "whisper_teacher": 4,
-    "qwen_llm": [5, 6, 7]  # Multi-GPU for LLM
-}
-```
-
-#### Training Optimizations
-- **Gradient Checkpointing**: Reduce memory by 50% at 20% speed cost
-- **Mixed Precision**: FP16 training reduces memory by 40-50%
-- **Data Pipeline**: Prefetch with 4-8 workers per GPU
-- **Model Parallelism**: Split Conformer layers across GPUs
-- **Dynamic Batching**: Variable sequence lengths with smart padding
-
-### Estimated Training Costs
-
-| Configuration | Time | AWS Cost | GCP Cost | Azure Cost |
-|---------------|------|----------|----------|------------|
-| Single RTX 4090 | 3-4 weeks | N/A | N/A | N/A |
-| 2x A100 40GB | 1-2 weeks | ~$10,000 | ~$8,000 | ~$9,000 |
-| 4x A100 80GB | 4-7 days | ~$15,000 | ~$12,000 | ~$13,000 |
-| 8x H100 80GB | 2-3 days | ~$20,000 | ~$18,000 | ~$19,000 |
-
-*Costs include compute, storage, and network transfer. Spot instances can reduce costs by 60-80%.*
-
-### Monitoring and Profiling
-
-#### Resource Monitoring
-- **Ray Dashboard**: Cluster utilization, task scheduling
-- **NVIDIA-SMI**: GPU utilization, memory usage
-- **Weights & Biases**: Training metrics, system monitoring
-- **TensorBoard**: Loss curves, gradient norms
-- **Prometheus + Grafana**: Infrastructure monitoring
-
-#### Performance Profiling
-- **PyTorch Profiler**: Identify bottlenecks
-- **NVIDIA Nsight**: GPU kernel optimization  
-- **Ray Memory Profiler**: Memory usage across nodes
-- **Data Loading Profiler**: I/O bottleneck detection
-
-## Development
-
-### Project Structure
-```
-valerie-visual-asr/
-├── src/                    # Source code
-│   ├── models/            # Model implementations
-│   ├── data/              # Data loading and preprocessing
-│   ├── training/          # Training pipeline
-│   ├── inference/         # Inference and decoding
-│   └── utils/             # Utilities and configuration
-├── configs/               # Configuration files
-├── scripts/               # Command-line scripts
-├── tests/                 # Unit and integration tests
-└── notebooks/             # Analysis and visualization
-```
-
-### Running Tests
-```bash
-# Run all tests
-pytest tests/
-
-# Run specific test file
-pytest tests/test_config.py
-
-# Run with coverage
-pytest --cov=src tests/
-```
-
-### Code Style
-```bash
-# Format code
-black src/ tests/ scripts/
-
-# Check style
-flake8 src/ tests/ scripts/
-
-# Type checking
-mypy src/
-```
+3. **Key changes**:
+   - Video frames → Audio waveforms (16kHz)
+   - 3D CNN → Mel spectrogram + Conformer
+   - Single teacher distillation → 3-teacher ensemble
+   - VoxCeleb2/AVSpeech → LibriSpeech
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
 ## Citation
 
-If you use this work in your research, please cite:
+If you use Valerie in your research, please cite:
 
 ```bibtex
-@article{valerie2024,
-  title={Valerie: Enhanced Visual ASR Language Model with Conformer Architecture and Knowledge Distillation},
-  author={[Your Name]},
-  journal={arXiv preprint},
-  year={2024}
+@misc{valerie2024,
+  title={Valerie: Audio ASR with Ensemble Knowledge Distillation},
+  author={Valerie Team},
+  year={2024},
+  howpublished={\url{https://github.com/valerie-team/valerie-asr}}
 }
 ```
 
 ## Acknowledgments
 
-- VoxCeleb2 dataset creators for providing diverse speaker data
-- AVSpeech dataset team for clean audio-visual segments
-- Conformer architecture developers for the hybrid CNN-Transformer design
-- Open source community for PyTorch and related libraries
+- **Teacher Models**: OpenAI Whisper, Facebook Wav2Vec2, Facebook HuBERT
+- **LLM**: Qwen team for Qwen 0.6B model
+- **Datasets**: LibriSpeech, WikiText, BookCorpus
+- **Frameworks**: PyTorch, Transformers
 
 ## Contact
 
-For questions and support, please open an issue on GitHub or contact us at contact@valerie-asr.com.
+For questions or issues, please:
+- Open an issue on GitHub
+- Email: contact@valerie-asr.dev
+
+---
+
+**Note**: This is the audio-only version of Valerie. The old video-based system has been deprecated and migrated to an audio-only ensemble distillation architecture for better performance and efficiency.

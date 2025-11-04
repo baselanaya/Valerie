@@ -7,14 +7,10 @@ model robustness while preserving phonetic content.
 
 import torch
 import torch.nn.functional as F
-import torchvision.transforms as T
 import torchaudio.transforms as AT
 import numpy as np
-import cv2
 import random
 from typing import Tuple, Optional, Dict, Any, List, Union
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import librosa
 from src.utils.logging import get_logger
 
@@ -165,62 +161,58 @@ class AudioTransforms:
 
 
 class MixupAugmentation:
-    """Mixup augmentation for audio-visual data."""
-    
+    """Mixup augmentation for audio-only data."""
+
     def __init__(self, alpha: float = 0.2, prob: float = 0.5):
         """
         Initialize mixup augmentation.
-        
+
         Args:
             alpha: Beta distribution parameter
             prob: Probability of applying mixup
         """
         self.alpha = alpha
         self.prob = prob
-        
+
         logger.info(f"✅ MixupAugmentation initialized (alpha={alpha}, prob={prob})")
-    
+
     def __call__(
-        self, 
+        self,
         batch_data: Dict[str, torch.Tensor]
     ) -> Tuple[Dict[str, torch.Tensor], torch.Tensor]:
         """
         Apply mixup to batch data.
-        
+
         Args:
-            batch_data: Batch dictionary with video and audio data
-            
+            batch_data: Batch dictionary with audio data
+
         Returns:
             Mixed batch data and mixing coefficients
         """
+        # Determine batch size from audio
+        if 'audio_waveforms' in batch_data:
+            batch_size = batch_data['audio_waveforms'].shape[0]
+        else:
+            # No audio to mix
+            return batch_data, torch.ones(1)
+
         if random.random() > self.prob:
             # No mixup, return original batch
-            batch_size = batch_data['video_frames'].shape[0]
             return batch_data, torch.ones(batch_size)
-        
-        batch_size = batch_data['video_frames'].shape[0]
-        
+
         # Sample mixing coefficients
         lam = np.random.beta(self.alpha, self.alpha, batch_size)
         lam = torch.from_numpy(lam).float()
-        
+
         # Create random permutation for mixing
         indices = torch.randperm(batch_size)
-        
-        # Mix video frames
-        if 'video_frames' in batch_data:
-            video_frames = batch_data['video_frames']
-            mixed_video = lam.view(-1, 1, 1, 1, 1) * video_frames + \
-                         (1 - lam).view(-1, 1, 1, 1, 1) * video_frames[indices]
-            batch_data['video_frames'] = mixed_video
-        
+
         # Mix audio waveforms
-        if 'audio_waveforms' in batch_data:
-            audio_waveforms = batch_data['audio_waveforms']
-            mixed_audio = lam.view(-1, 1) * audio_waveforms + \
-                         (1 - lam).view(-1, 1) * audio_waveforms[indices]
-            batch_data['audio_waveforms'] = mixed_audio
-        
+        audio_waveforms = batch_data['audio_waveforms']
+        mixed_audio = lam.view(-1, 1) * audio_waveforms + \
+                     (1 - lam).view(-1, 1) * audio_waveforms[indices]
+        batch_data['audio_waveforms'] = mixed_audio
+
         return batch_data, lam
 
 
