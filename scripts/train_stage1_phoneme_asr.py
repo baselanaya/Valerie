@@ -5,7 +5,7 @@ This script trains the audio-to-phoneme ASR model (student) using:
 - LibriSpeech dataset (30-100 hours)
 - Ensemble knowledge distillation from 3 teacher models:
   1. Whisper Large V3
-  2. Wav2Vec2 Large
+  2. WavLM Large
   3. HuBERT Large
 
 Target: <35% PER (Phoneme Error Rate)

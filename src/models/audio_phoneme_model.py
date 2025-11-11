@@ -140,8 +140,8 @@ class AudioPhonemeASR(nn.Module):
                             'weight': 0.4
                         },
                         {
-                            'model_name': 'facebook/wav2vec2-large-960h-lv60-self',
-                            'model_type': 'wav2vec2',
+                            'model_name': 'microsoft/wavlm-large',
+                            'model_type': 'wavlm',
                             'weight': 0.3
                         },
                         {

@@ -93,21 +93,40 @@ python scripts/train_stage3_end_to_end.py \
 
 ### Inference
 
+Using the simple ValerieASR interface:
+
 ```python
-from src.inference.inference_engine import AudioInferenceEngine, InferenceConfig
+from ValerieASR import load_asr
 
-# Initialize engine
-config = InferenceConfig(
-    stage1_checkpoint="checkpoints/stage1/best_model.pt",
-    stage2_checkpoint="checkpoints/stage2/best_model.pt",
-    use_llm_reconstruction=True
-)
-engine = AudioInferenceEngine(config)
+# Load model (supports .safetensors or .pt formats)
+asr = load_asr("checkpoints/valerie_final.safetensors")
 
-# Transcribe audio
-result = engine.transcribe("audio.wav")
+# Transcribe single audio file
+result = asr.transcribe("audio.wav")
 print(f"Text: {result.text}")
 print(f"Confidence: {result.confidence:.2%}")
+
+# Batch transcription
+results = asr.transcribe_batch(["audio1.wav", "audio2.wav"])
+for i, result in enumerate(results):
+    print(f"File {i+1}: {result.text}")
+
+# Get phonemes
+result = asr.transcribe("audio.wav", return_phonemes=True)
+print(f"Phonemes: {' '.join(result.phonemes)}")
+```
+
+Or use the CLI:
+
+```bash
+# Simple transcription
+python ValerieASR.py checkpoints/valerie_final.safetensors audio.wav
+
+# Or use the inference engine directly
+python scripts/inference.py \
+  --checkpoint checkpoints/valerie_final.safetensors \
+  --audio audio.wav \
+  --output transcription.txt
 ```
 
 ### Evaluation
@@ -184,30 +203,60 @@ distillation:
 
 ```
 Valerie/
+├── ValerieASR.py           # Main entry point for inference
 ├── src/
 │   ├── models/              # Model implementations
+│   │   ├── audio_phoneme_model.py  # Student model (Stage 1)
+│   │   ├── ensemble_distillation.py  # Teacher ensemble
+│   │   └── qwen_llm.py      # LLM for Stage 2
 │   ├── data/                # Data processing
 │   ├── training/            # Training loops
-│   └── inference/           # Inference engine
+│   ├── inference/           # Inference engine
+│   └── utils/               # Utilities (config, logging)
 ├── scripts/                 # Training scripts
+│   ├── train_stage1_phoneme_asr.py
+│   ├── train_stage2_phoneme_to_text.py
+│   └── train_stage3_end_to_end.py
 ├── configs/                 # Configuration files
+│   └── ensemble_distillation_config.yaml
 ├── tests/                   # Unit tests
 ├── README.md               # This file
-└── ARCHITECTURE.md         # Detailed architecture
+├── ARCHITECTURE.md         # Detailed architecture
+└── HARDWARE_REQUIREMENTS.md  # Hardware requirements
 ```
+
+## Model Format
+
+Valerie supports both **safetensors** (recommended) and PyTorch `.pt` formats:
+
+- **Safetensors** (.safetensors): Faster loading, safer, better for production
+- **PyTorch** (.pt): Traditional format, backward compatible
+
+```python
+# Both formats work seamlessly
+asr = load_asr("model.safetensors")  # Recommended
+asr = load_asr("model.pt")           # Also supported
+```
+
+Models are automatically detected and loaded based on file extension.
 
 ## Hardware Requirements
 
-### Training (Stage 1)
-- GPU: NVIDIA A100 (40GB) or equivalent
-- RAM: 32GB+
-- Storage: 100GB+ for LibriSpeech + teacher models
-- Time: ~24-48 hours for 50 epochs
+For detailed hardware requirements, see [HARDWARE_REQUIREMENTS.md](HARDWARE_REQUIREMENTS.md).
 
-### Inference
-- GPU: Any CUDA-capable GPU (4GB+ VRAM)
-- CPU: Possible but slower (10x)
-- Latency: ~20-70ms per second of audio
+### Quick Summary
+
+**Training:**
+- Minimum: RTX 3090 (24GB) for Stage 1, RTX 3060 (12GB) for Stage 2
+- Recommended: A100 (40GB) for faster training
+- Total time: 17-50 hours across all stages
+- Total cost (cloud): $30-75 on AWS/GCP, $15-30 on Vast.ai
+
+**Inference:**
+- Minimum: RTX 3060 (12 GB) for real-time
+- Throughput: 100-200x real-time on RTX 3090
+- CPU-only: Possible but ~5x slower than real-time
+- Latency: 50-100ms per second of audio (GPU)
 
 ## Citation
 
